@@ -33,6 +33,7 @@ import Leaderboard from "@/pages/Leaderboard";
 import Reports from "@/pages/Reports";
 import Skills from "@/pages/Skills";
 import StaffNew from "@/pages/StaffNew";
+import AuditLog from "@/pages/AuditLog";
 
 import type { AuthResponseRole } from "@workspace/api-client-react";
 
@@ -68,6 +69,7 @@ function AdminPortalRoutes() {
         <Route path="/reports" component={Reports} />
         <Route path="/skills" component={Skills} />
         <Route path="/staff/new" component={StaffNew} />
+        <Route path="/audit-log" component={AuditLog} />
         <Route path="/profile" component={Profile} />
         <Route component={NotFound} />
       </Switch>

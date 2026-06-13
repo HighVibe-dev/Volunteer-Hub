@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Calendar, ClipboardList, CheckSquare,
-  Award, Trophy, BarChart3, Wrench, UserPlus, LogOut, User,
+  Award, Trophy, BarChart3, Wrench, UserPlus, LogOut, User, ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +16,7 @@ const ADMIN_LINKS = [
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/skills", label: "Skills", icon: Wrench },
   { href: "/staff/new", label: "Add Staff", icon: UserPlus },
+  { href: "/audit-log", label: "Audit Log", icon: ShieldAlert },
 ];
 
 const COORDINATOR_LINKS = [

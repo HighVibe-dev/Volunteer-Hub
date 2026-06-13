@@ -148,7 +148,7 @@ export default function CoordinatorAttendance() {
                     <div className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ongoing</div>
                     {ongoingEvents.content.map((e) => (
                       <SelectItem key={e.id} value={e.id.toString()}>
-                        🟢 {e.title}
+                        {e.title}
                       </SelectItem>
                     ))}
                   </>
@@ -158,7 +158,7 @@ export default function CoordinatorAttendance() {
                     <div className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Upcoming</div>
                     {upcomingEvents.content.map((e) => (
                       <SelectItem key={e.id} value={e.id.toString()}>
-                        📅 {e.title}
+                        {e.title}
                       </SelectItem>
                     ))}
                   </>

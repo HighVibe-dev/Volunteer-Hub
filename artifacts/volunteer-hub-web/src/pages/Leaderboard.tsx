@@ -5,6 +5,7 @@ import {
   GetLeaderboardPeriod,
 } from "@workspace/api-client-react";
 import type { GetLeaderboardParams } from "@workspace/api-client-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,6 +17,7 @@ const RANK_COLORS = ["#EE7F31", "#C0C0C0", "#CD7F32"];
 type Period = "weekly" | "monthly" | "all-time";
 
 export default function Leaderboard() {
+  const { user } = useAuth();
   const [period, setPeriod] = useState<Period>("all-time");
   const [limit] = useState(10);
 
@@ -59,7 +61,11 @@ export default function Leaderboard() {
             {data?.map((entry, idx) => (
               <div
                 key={entry.volunteerId}
-                className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:shadow-sm transition-shadow"
+                className={`flex items-center gap-4 p-4 rounded-lg border hover:shadow-sm transition-shadow ${
+                  entry.volunteerId === user?.userId
+                    ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20"
+                    : "bg-card"
+                }`}
                 data-testid={`row-leaderboard-${entry.volunteerId}`}
               >
                 <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm shrink-0 ${
