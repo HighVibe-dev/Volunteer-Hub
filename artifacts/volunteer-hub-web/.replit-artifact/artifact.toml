@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "NayePankh Volunteer Hub"
+version = "1.0.0"
+id = "artifacts/volunteer-hub-web"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19031
+
+[services.development]
+run = "pnpm --filter @workspace/volunteer-hub-web run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/volunteer-hub-web", "run", "build" ]
+publicDir = "artifacts/volunteer-hub-web/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19031"
+BASE_PATH = "/"

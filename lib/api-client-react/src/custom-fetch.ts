@@ -322,6 +322,23 @@ async function parseSuccessBody(
   }
 }
 
+/**
+ * Unwrap Spring Boot ApiResponse<T> envelope.
+ * Spring Boot returns { success: boolean, message: string, data: T, timestamp: string }.
+ * This strips the envelope so callers receive T directly.
+ */
+function unwrapSpringBootResponse(body: unknown): unknown {
+  if (
+    body !== null &&
+    typeof body === "object" &&
+    "success" in body &&
+    "data" in body
+  ) {
+    return (body as Record<string, unknown>)["data"];
+  }
+  return body;
+}
+
 export async function customFetch<T = unknown>(
   input: RequestInfo | URL,
   options: CustomFetchOptions = {},
@@ -367,5 +384,6 @@ export async function customFetch<T = unknown>(
     throw new ApiError(response, errorData, requestInfo);
   }
 
-  return (await parseSuccessBody(response, responseType, requestInfo)) as T;
+  const body = await parseSuccessBody(response, responseType, requestInfo);
+  return unwrapSpringBootResponse(body) as T;
 }
