@@ -1,5 +1,1 @@
-- [Spring Boot on Replit](spring-boot-replit.md) — DATABASE_URL is postgresql:// not jdbc:postgresql://; requires DataSourceConfig.java to convert
-- [NayePankh API project](nayepankh-api.md) — Spring Boot 3.2.5 / Java 19 backend running on port 8099, context path /api
-- [NayePankh native query gotchas](nayepankh-native-queries.md) — PostgreSQL null-param bytea error, Hibernate camelCase ORDER BY conflict, table name must match @Table annotation
-- [NayePankh JWT secret handling](nayepankh-jwt.md) — @PostConstruct random key fallback pattern when env var not set; avoids hardcoded secret
-- [NayePankh frontend patterns](nayepankh-frontend.md) — Generated API hook patterns: queryKey required, status enums need casting, setAuthTokenGetter at app init
+- [Axios baseURL double-path](axios-baseurl-double-path.md) — generated client URLs already include /api; axios instance must NOT have baseURL set or paths double up.
