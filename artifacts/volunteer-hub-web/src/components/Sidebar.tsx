@@ -1,24 +1,24 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Calendar, 
-  ClipboardList, 
-  CheckSquare, 
-  Award, 
-  Trophy, 
-  BarChart3, 
+import {
+  LayoutDashboard,
+  Users,
+  Calendar,
+  ClipboardList,
+  CheckSquare,
+  Award,
+  Trophy,
+  BarChart3,
   Wrench,
   UserPlus,
   LogOut,
-  User
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ADMIN_LINKS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/volunteers", label: "Volunteers", icon: Users },
   { href: "/events", label: "Events", icon: Calendar },
   { href: "/applications", label: "Applications", icon: ClipboardList },
@@ -29,7 +29,7 @@ const ADMIN_LINKS = [
 ];
 
 const COORDINATOR_LINKS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/coordinator/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/volunteers", label: "Volunteers", icon: Users },
   { href: "/events", label: "Events", icon: Calendar },
   { href: "/applications", label: "Applications", icon: ClipboardList },
@@ -38,7 +38,7 @@ const COORDINATOR_LINKS = [
 ];
 
 const VOLUNTEER_LINKS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/volunteer/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/events", label: "Events", icon: Calendar },
   { href: "/applications", label: "My Applications", icon: ClipboardList },
   { href: "/attendance", label: "My Attendance", icon: CheckSquare },
@@ -57,27 +57,35 @@ export function Sidebar() {
   if (user.role === "ADMIN") links = ADMIN_LINKS;
   if (user.role === "COORDINATOR") links = COORDINATOR_LINKS;
 
+  const isActive = (href: string) =>
+    location === href || location.startsWith(`${href}/`);
+
   return (
     <aside className="w-64 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col h-screen sticky top-0">
       <div className="p-6">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-sidebar-primary">
           <span className="bg-sidebar-primary text-sidebar-primary-foreground p-1 rounded">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m8 17 4 4 4-4"></path></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+              <path d="M12 12v9" />
+              <path d="m8 17 4 4 4-4" />
+            </svg>
           </span>
           NayePankh
         </Link>
+        <div className="mt-1 text-xs text-muted-foreground capitalize">{user.role.toLowerCase()} portal</div>
       </div>
 
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
         {links.map((link) => {
           const Icon = link.icon;
-          const isActive = location === link.href || location.startsWith(`${link.href}/`);
+          const active = isActive(link.href);
           return (
             <Link key={link.href} href={link.href}>
               <a
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                  isActive
+                  active
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
@@ -93,17 +101,17 @@ export function Sidebar() {
 
       <div className="p-4 border-t border-sidebar-border">
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
             {user.firstName[0]}
           </div>
           <div className="flex flex-col overflow-hidden">
             <span className="text-sm font-medium truncate">{user.firstName} {user.lastName}</span>
-            <span className="text-xs text-muted-foreground truncate">{user.role}</span>
+            <span className="text-xs text-muted-foreground truncate capitalize">{user.role.toLowerCase()}</span>
           </div>
         </div>
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start text-muted-foreground hover:text-foreground" 
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-muted-foreground hover:text-foreground"
           onClick={logout}
           data-testid="nav-logout"
         >

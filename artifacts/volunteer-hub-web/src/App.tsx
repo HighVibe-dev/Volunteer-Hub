@@ -11,8 +11,12 @@ import NotFound from "@/pages/not-found";
 
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import Dashboard from "@/pages/Dashboard";
 import Unauthorized from "@/pages/Unauthorized";
+
+import AdminDashboard from "@/pages/AdminDashboard";
+import CoordinatorDashboard from "@/pages/CoordinatorDashboard";
+import VolunteerDashboard from "@/pages/VolunteerDashboard";
+
 import Volunteers from "@/pages/Volunteers";
 import VolunteerDetail from "@/pages/VolunteerDetail";
 import Profile from "@/pages/Profile";
@@ -26,25 +30,31 @@ import Leaderboard from "@/pages/Leaderboard";
 import Reports from "@/pages/Reports";
 import Skills from "@/pages/Skills";
 import StaffNew from "@/pages/StaffNew";
+
 import { AuthResponseRole } from "@workspace/api-client-react";
+import { useToast } from "@/hooks/use-toast";
 
 const ADMIN: AuthResponseRole[] = ["ADMIN"];
 const STAFF: AuthResponseRole[] = ["ADMIN", "COORDINATOR"];
+const COORD_ONLY: AuthResponseRole[] = ["COORDINATOR"];
 const ALL_ROLES: AuthResponseRole[] = ["ADMIN", "COORDINATOR", "VOLUNTEER"];
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+function getRoleDashboardPath(role?: AuthResponseRole): string {
+  if (role === "ADMIN") return "/admin/dashboard";
+  if (role === "COORDINATOR") return "/coordinator/dashboard";
+  return "/volunteer/dashboard";
+}
+
+function RoleDashboardRedirect() {
+  const { user, isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Redirect to="/login" />;
+  return <Redirect to={getRoleDashboardPath(user?.role)} />;
+}
 
 function RootRoute() {
-  const { isAuthenticated } = useAuth();
-  if (isAuthenticated) return <Redirect to="/dashboard" />;
-  return <Redirect to="/login" />;
+  const { isAuthenticated, user } = useAuth();
+  if (!isAuthenticated) return <Redirect to="/login" />;
+  return <Redirect to={getRoleDashboardPath(user?.role)} />;
 }
 
 function Router() {
@@ -61,10 +71,27 @@ function Router() {
       <Route path="/:rest*">
         <Layout>
           <Switch>
+            {/* Legacy /dashboard redirect to role portal */}
             <Route path="/dashboard">
-              <ProtectedRoute component={Dashboard} allowedRoles={ALL_ROLES} />
+              <RoleDashboardRedirect />
             </Route>
 
+            {/* Admin portal */}
+            <Route path="/admin/dashboard">
+              <ProtectedRoute component={AdminDashboard} allowedRoles={ADMIN} />
+            </Route>
+
+            {/* Coordinator portal */}
+            <Route path="/coordinator/dashboard">
+              <ProtectedRoute component={CoordinatorDashboard} allowedRoles={STAFF} />
+            </Route>
+
+            {/* Volunteer portal */}
+            <Route path="/volunteer/dashboard">
+              <ProtectedRoute component={VolunteerDashboard} allowedRoles={ALL_ROLES} />
+            </Route>
+
+            {/* Volunteer management (admin/coord) */}
             <Route path="/volunteers">
               <ProtectedRoute component={Volunteers} allowedRoles={STAFF} />
             </Route>
@@ -72,10 +99,12 @@ function Router() {
               <ProtectedRoute component={VolunteerDetail} allowedRoles={STAFF} />
             </Route>
 
+            {/* Profile (all) */}
             <Route path="/profile">
               <ProtectedRoute component={Profile} allowedRoles={ALL_ROLES} />
             </Route>
 
+            {/* Events */}
             <Route path="/events/new">
               <ProtectedRoute component={EventForm} allowedRoles={STAFF} />
             </Route>
@@ -89,30 +118,37 @@ function Router() {
               <ProtectedRoute component={Events} allowedRoles={ALL_ROLES} />
             </Route>
 
+            {/* Applications */}
             <Route path="/applications">
               <ProtectedRoute component={Applications} allowedRoles={ALL_ROLES} />
             </Route>
 
+            {/* Attendance */}
             <Route path="/attendance">
               <ProtectedRoute component={Attendance} allowedRoles={ALL_ROLES} />
             </Route>
 
+            {/* Certificates */}
             <Route path="/certificates">
               <ProtectedRoute component={Certificates} allowedRoles={ALL_ROLES} />
             </Route>
 
+            {/* Leaderboard */}
             <Route path="/leaderboard">
               <ProtectedRoute component={Leaderboard} allowedRoles={ALL_ROLES} />
             </Route>
 
+            {/* Reports (staff only) */}
             <Route path="/reports">
               <ProtectedRoute component={Reports} allowedRoles={STAFF} />
             </Route>
 
+            {/* Skills (admin only) */}
             <Route path="/skills">
               <ProtectedRoute component={Skills} allowedRoles={ADMIN} />
             </Route>
 
+            {/* Staff creation (admin only) */}
             <Route path="/staff/new">
               <ProtectedRoute component={StaffNew} allowedRoles={ADMIN} />
             </Route>
@@ -125,21 +161,60 @@ function Router() {
   );
 }
 
+function createQueryClient(onUnauthorized: () => void) {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: (failureCount, error: any) => {
+          if (error?.status === 401 || error?.response?.status === 401) {
+            onUnauthorized();
+            return false;
+          }
+          return failureCount < 1;
+        },
+        refetchOnWindowFocus: false,
+      },
+      mutations: {
+        onError: (error: any) => {
+          if (error?.status === 401 || error?.response?.status === 401) {
+            onUnauthorized();
+          }
+        },
+      },
+    },
+  });
+}
+
+function AppProviders() {
+  const handleUnauthorized = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  };
+
+  const queryClient = createQueryClient(handleUnauthorized);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
+
 function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="light" storageKey="naye-pankh-theme">
-          <AuthProvider>
-            <TooltipProvider>
-              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-                <Router />
-              </WouterRouter>
-              <Toaster />
-            </TooltipProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <ThemeProvider defaultTheme="light" storageKey="naye-pankh-theme">
+        <AppProviders />
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
