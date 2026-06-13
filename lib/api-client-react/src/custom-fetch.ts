@@ -18,6 +18,28 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 let _baseUrl: string | null = null;
 let _authTokenGetter: AuthTokenGetter | null = null;
 
+// ---------------------------------------------------------------------------
+// Optional Axios adapter — when set, all HTTP calls are routed through the
+// provided Axios instance so its request/response interceptors (Bearer token
+// attachment, 401 redirect, etc.) are applied to every generated hook call.
+// ---------------------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AxiosLikeInstance = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  request<T = unknown>(config: any): Promise<{ data: T; status: number; headers: any }>;
+};
+
+let _axiosInstance: AxiosLikeInstance | null = null;
+
+/**
+ * Register an Axios instance so that all generated-client API calls are routed
+ * through its interceptors (auth headers, 401 handling, etc.).
+ * Call this once during app initialisation, e.g. in main.tsx.
+ */
+export function setAxiosInstance(instance: AxiosLikeInstance | null): void {
+  _axiosInstance = instance;
+}
+
 /**
  * Set a base URL that is prepended to every relative request URL
  * (i.e. paths that start with `/`).
@@ -339,10 +361,50 @@ function unwrapSpringBootResponse(body: unknown): unknown {
   return body;
 }
 
+async function customFetchViaAxios<T>(
+  input: RequestInfo | URL,
+  options: CustomFetchOptions,
+): Promise<T> {
+  input = applyBaseUrl(input);
+  const { responseType = "auto", headers: headersInit, signal, ...init } = options as CustomFetchOptions & { signal?: AbortSignal };
+  const method = resolveMethod(input, init.method);
+  const url = resolveUrl(input);
+
+  const headersObj: Record<string, string> = {};
+  mergeHeaders(isRequest(input) ? (input as Request).headers : undefined, headersInit).forEach(
+    (value, key) => { headersObj[key] = value; },
+  );
+
+  let data: unknown = undefined;
+  if (init.body != null) {
+    if (typeof init.body === "string") {
+      try { data = JSON.parse(init.body); } catch { data = init.body; }
+    } else {
+      data = init.body;
+    }
+  }
+
+  const axiosResponseType = responseType === "blob" ? "blob" : "json";
+  const resp = await _axiosInstance!.request<T>({
+    method,
+    url,
+    headers: headersObj,
+    data,
+    responseType: axiosResponseType,
+    signal,
+  });
+
+  return unwrapSpringBootResponse(resp.data) as T;
+}
+
 export async function customFetch<T = unknown>(
   input: RequestInfo | URL,
   options: CustomFetchOptions = {},
 ): Promise<T> {
+  if (_axiosInstance) {
+    return customFetchViaAxios<T>(input, options);
+  }
+
   input = applyBaseUrl(input);
   const { responseType = "auto", headers: headersInit, ...init } = options;
 

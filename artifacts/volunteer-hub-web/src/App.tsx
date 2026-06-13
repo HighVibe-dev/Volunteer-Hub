@@ -53,6 +53,12 @@ function RoleDashboardRedirect() {
   return <Redirect to={getRoleDashboardPath(user?.role)} />;
 }
 
+function LeaderboardRedirect() {
+  const { user } = useAuth();
+  const base = user?.role === "ADMIN" ? "/admin" : user?.role === "COORDINATOR" ? "/coordinator" : "/volunteer";
+  return <Redirect to={`${base}/leaderboard`} />;
+}
+
 function AdminPortalRoutes() {
   return (
     <Layout>
@@ -153,6 +159,13 @@ function Router() {
               <VolunteerPortalRoutes />
             </WouterRouter>
           )}
+          allowedRoles={ALL_ROLES}
+        />
+      </Route>
+
+      <Route path="/leaderboard">
+        <ProtectedRoute
+          component={LeaderboardRedirect}
           allowedRoles={ALL_ROLES}
         />
       </Route>
