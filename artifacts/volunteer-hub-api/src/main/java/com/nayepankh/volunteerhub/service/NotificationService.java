@@ -8,6 +8,7 @@ import com.nayepankh.volunteerhub.repository.NotificationRepository;
 import com.nayepankh.volunteerhub.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
@@ -24,14 +26,20 @@ public class NotificationService {
     public void createNotification(Long userId, String title, String message) {
         try {
             User user = userRepository.findById(userId).orElse(null);
-            if (user == null) return;
+            if (user == null) {
+                log.warn("[Notification] User {} not found — notification '{}' dropped", userId, title);
+                return;
+            }
             Notification n = Notification.builder()
                     .user(user)
                     .title(title)
                     .message(message)
                     .build();
             notificationRepository.save(n);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            log.warn("[Notification] Failed to create notification for user {} title '{}': {}",
+                    userId, title, e.getMessage(), e);
+        }
     }
 
     public Page<NotificationResponse> getUserNotifications(Long userId, Pageable pageable) {
