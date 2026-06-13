@@ -1,0 +1,2 @@
+- [Spring Boot on Replit](spring-boot-replit.md) — DATABASE_URL is postgresql:// not jdbc:postgresql://; requires DataSourceConfig.java to convert
+- [NayePankh API project](nayepankh-api.md) — Spring Boot 3.2.5 / Java 19 backend running on port 8099, context path /api
