@@ -12,6 +12,8 @@ import {
   useMarkAllNotificationsRead,
   useGlobalSearch,
   getGlobalSearchQueryKey,
+  useListCertificates,
+  getListCertificatesQueryKey,
 } from "@workspace/api-client-react";
 import { Bell, Search, Sun, Moon, Menu, Check, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -205,9 +207,27 @@ export function TopNav() {
     }
   );
 
+  const { data: allCertificates } = useListCertificates(
+    { size: 50 },
+    {
+      query: {
+        enabled: debouncedQuery.length >= 2,
+        queryKey: getListCertificatesQueryKey({ size: 50 }),
+      },
+    }
+  );
+
+  const matchedCertificates = debouncedQuery.length >= 2
+    ? (allCertificates?.content ?? []).filter((c) =>
+        c.eventTitle?.toLowerCase().includes(debouncedQuery.toLowerCase())
+      ).slice(0, 3)
+    : [];
+
   const hasResults =
     searchResults &&
-    ((searchResults.events?.length ?? 0) > 0 || (searchResults.volunteers?.length ?? 0) > 0);
+    ((searchResults.events?.length ?? 0) > 0 ||
+      (searchResults.volunteers?.length ?? 0) > 0 ||
+      matchedCertificates.length > 0);
 
   const navigate = (path: string) => {
     setLocation(path);
@@ -251,7 +271,7 @@ export function TopNav() {
                 <div className="p-4 text-center text-sm text-muted-foreground">Searching…</div>
               ) : hasResults ? (
                 <>
-                  {searchResults.events && searchResults.events.length > 0 && (
+                  {searchResults?.events && searchResults.events.length > 0 && (
                     <div>
                       <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                         Events
@@ -271,7 +291,7 @@ export function TopNav() {
                       ))}
                     </div>
                   )}
-                  {searchResults.volunteers && searchResults.volunteers.length > 0 && (
+                  {searchResults?.volunteers && searchResults.volunteers.length > 0 && (
                     <div>
                       <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                         Volunteers
@@ -289,6 +309,26 @@ export function TopNav() {
                           {vol.email && (
                             <div className="text-xs text-muted-foreground">{vol.email}</div>
                           )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {matchedCertificates.length > 0 && (
+                    <div>
+                      <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Certificates
+                      </div>
+                      {matchedCertificates.map((cert) => (
+                        <div
+                          key={`cert-${cert.id}`}
+                          className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                          onClick={() => navigate(`/certificates`)}
+                          data-testid={`search-cert-${cert.id}`}
+                        >
+                          <div className="font-medium">{cert.eventTitle}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Issued {new Date(cert.issuedAt).toLocaleDateString()}
+                          </div>
                         </div>
                       ))}
                     </div>

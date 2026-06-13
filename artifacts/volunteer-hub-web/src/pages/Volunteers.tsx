@@ -29,6 +29,8 @@ export default function Volunteers() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState<string>("all");
+  const [skill, setSkill] = useState("");
+  const [debouncedSkill, setDebouncedSkill] = useState("");
   const qc = useQueryClient();
   const { toast } = useToast();
 
@@ -37,6 +39,7 @@ export default function Volunteers() {
     size: 20,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(status && status !== "all" ? { status: status as typeof ListVolunteersStatus[keyof typeof ListVolunteersStatus] } : {}),
+    ...(debouncedSkill ? { skill: debouncedSkill } : {}),
   };
 
   const { data, isLoading } = useListVolunteers(params, {
@@ -58,6 +61,15 @@ export default function Volunteers() {
   const handleStatusChange = (val: string) => {
     setStatus(val);
     setPage(0);
+  };
+
+  const handleSkillFilter = (val: string) => {
+    setSkill(val);
+    clearTimeout((window as any).__vskillTimer);
+    (window as any).__vskillTimer = setTimeout(() => {
+      setDebouncedSkill(val);
+      setPage(0);
+    }, 300);
   };
 
   const handleActivate = (id: number) => {
@@ -87,8 +99,8 @@ export default function Volunteers() {
         <p className="text-muted-foreground">Manage volunteer accounts and status</p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by name or email..."
@@ -98,6 +110,13 @@ export default function Volunteers() {
             data-testid="input-volunteer-search"
           />
         </div>
+        <Input
+          placeholder="Filter by skill..."
+          className="w-48"
+          value={skill}
+          onChange={(e) => handleSkillFilter(e.target.value)}
+          data-testid="input-volunteer-skill"
+        />
         <Select value={status} onValueChange={handleStatusChange}>
           <SelectTrigger className="w-40" data-testid="select-volunteer-status">
             <SelectValue placeholder="Filter status" />

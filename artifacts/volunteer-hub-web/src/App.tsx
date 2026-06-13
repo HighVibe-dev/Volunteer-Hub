@@ -1,5 +1,6 @@
-import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
+import { Switch, Route, Router as WouterRouter, Redirect, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -11,6 +12,7 @@ import NotFound from "@/pages/not-found";
 
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import ForgotPassword from "@/pages/ForgotPassword";
 import Unauthorized from "@/pages/Unauthorized";
 
 import AdminDashboard from "@/pages/AdminDashboard";
@@ -25,21 +27,20 @@ import EventForm from "@/pages/EventForm";
 import EventDetail from "@/pages/EventDetail";
 import Applications from "@/pages/Applications";
 import Attendance from "@/pages/Attendance";
+import CoordinatorAttendance from "@/pages/CoordinatorAttendance";
 import Certificates from "@/pages/Certificates";
 import Leaderboard from "@/pages/Leaderboard";
 import Reports from "@/pages/Reports";
 import Skills from "@/pages/Skills";
 import StaffNew from "@/pages/StaffNew";
 
-import { AuthResponseRole } from "@workspace/api-client-react";
-import { useToast } from "@/hooks/use-toast";
+import type { AuthResponseRole } from "@workspace/api-client-react";
 
 const ADMIN: AuthResponseRole[] = ["ADMIN"];
 const STAFF: AuthResponseRole[] = ["ADMIN", "COORDINATOR"];
-const COORD_ONLY: AuthResponseRole[] = ["COORDINATOR"];
 const ALL_ROLES: AuthResponseRole[] = ["ADMIN", "COORDINATOR", "VOLUNTEER"];
 
-function getRoleDashboardPath(role?: AuthResponseRole): string {
+export function getRoleDashboardPath(role?: AuthResponseRole): string {
   if (role === "ADMIN") return "/admin/dashboard";
   if (role === "COORDINATOR") return "/coordinator/dashboard";
   return "/volunteer/dashboard";
@@ -51,10 +52,66 @@ function RoleDashboardRedirect() {
   return <Redirect to={getRoleDashboardPath(user?.role)} />;
 }
 
-function RootRoute() {
-  const { isAuthenticated, user } = useAuth();
-  if (!isAuthenticated) return <Redirect to="/login" />;
-  return <Redirect to={getRoleDashboardPath(user?.role)} />;
+function AdminPortalRoutes() {
+  return (
+    <Layout>
+      <Switch>
+        <Route path="/dashboard" component={AdminDashboard} />
+        <Route path="/volunteers/:id" component={VolunteerDetail} />
+        <Route path="/volunteers" component={Volunteers} />
+        <Route path="/events/new" component={EventForm} />
+        <Route path="/events/:id/edit" component={EventForm} />
+        <Route path="/events/:id" component={EventDetail} />
+        <Route path="/events" component={Events} />
+        <Route path="/applications" component={Applications} />
+        <Route path="/leaderboard" component={Leaderboard} />
+        <Route path="/reports" component={Reports} />
+        <Route path="/skills" component={Skills} />
+        <Route path="/staff/new" component={StaffNew} />
+        <Route path="/profile" component={Profile} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
+  );
+}
+
+function CoordinatorPortalRoutes() {
+  return (
+    <Layout>
+      <Switch>
+        <Route path="/dashboard" component={CoordinatorDashboard} />
+        <Route path="/volunteers/:id" component={VolunteerDetail} />
+        <Route path="/volunteers" component={Volunteers} />
+        <Route path="/events/new" component={EventForm} />
+        <Route path="/events/:id/edit" component={EventForm} />
+        <Route path="/events/:id" component={EventDetail} />
+        <Route path="/events" component={Events} />
+        <Route path="/applications" component={Applications} />
+        <Route path="/attendance" component={CoordinatorAttendance} />
+        <Route path="/leaderboard" component={Leaderboard} />
+        <Route path="/profile" component={Profile} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
+  );
+}
+
+function VolunteerPortalRoutes() {
+  return (
+    <Layout>
+      <Switch>
+        <Route path="/dashboard" component={VolunteerDashboard} />
+        <Route path="/events/:id" component={EventDetail} />
+        <Route path="/events" component={Events} />
+        <Route path="/applications" component={Applications} />
+        <Route path="/attendance" component={Attendance} />
+        <Route path="/certificates" component={Certificates} />
+        <Route path="/leaderboard" component={Leaderboard} />
+        <Route path="/profile" component={Profile} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
+  );
 }
 
 function Router() {
@@ -62,127 +119,53 @@ function Router() {
     <Switch>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/unauthorized" component={Unauthorized} />
 
+      <Route path="/admin/:rest*">
+        <ProtectedRoute
+          component={() => (
+            <WouterRouter base="/admin">
+              <AdminPortalRoutes />
+            </WouterRouter>
+          )}
+          allowedRoles={ADMIN}
+        />
+      </Route>
+
+      <Route path="/coordinator/:rest*">
+        <ProtectedRoute
+          component={() => (
+            <WouterRouter base="/coordinator">
+              <CoordinatorPortalRoutes />
+            </WouterRouter>
+          )}
+          allowedRoles={STAFF}
+        />
+      </Route>
+
+      <Route path="/volunteer/:rest*">
+        <ProtectedRoute
+          component={() => (
+            <WouterRouter base="/volunteer">
+              <VolunteerPortalRoutes />
+            </WouterRouter>
+          )}
+          allowedRoles={ALL_ROLES}
+        />
+      </Route>
+
+      <Route path="/dashboard">
+        <RoleDashboardRedirect />
+      </Route>
+
       <Route path="/">
-        <RootRoute />
+        <RoleDashboardRedirect />
       </Route>
 
-      <Route path="/:rest*">
-        <Layout>
-          <Switch>
-            {/* Legacy /dashboard redirect to role portal */}
-            <Route path="/dashboard">
-              <RoleDashboardRedirect />
-            </Route>
-
-            {/* Admin portal */}
-            <Route path="/admin/dashboard">
-              <ProtectedRoute component={AdminDashboard} allowedRoles={ADMIN} />
-            </Route>
-
-            {/* Coordinator portal */}
-            <Route path="/coordinator/dashboard">
-              <ProtectedRoute component={CoordinatorDashboard} allowedRoles={STAFF} />
-            </Route>
-
-            {/* Volunteer portal */}
-            <Route path="/volunteer/dashboard">
-              <ProtectedRoute component={VolunteerDashboard} allowedRoles={ALL_ROLES} />
-            </Route>
-
-            {/* Volunteer management (admin/coord) */}
-            <Route path="/volunteers">
-              <ProtectedRoute component={Volunteers} allowedRoles={STAFF} />
-            </Route>
-            <Route path="/volunteers/:id">
-              <ProtectedRoute component={VolunteerDetail} allowedRoles={STAFF} />
-            </Route>
-
-            {/* Profile (all) */}
-            <Route path="/profile">
-              <ProtectedRoute component={Profile} allowedRoles={ALL_ROLES} />
-            </Route>
-
-            {/* Events */}
-            <Route path="/events/new">
-              <ProtectedRoute component={EventForm} allowedRoles={STAFF} />
-            </Route>
-            <Route path="/events/:id/edit">
-              <ProtectedRoute component={EventForm} allowedRoles={STAFF} />
-            </Route>
-            <Route path="/events/:id">
-              <ProtectedRoute component={EventDetail} allowedRoles={ALL_ROLES} />
-            </Route>
-            <Route path="/events">
-              <ProtectedRoute component={Events} allowedRoles={ALL_ROLES} />
-            </Route>
-
-            {/* Applications */}
-            <Route path="/applications">
-              <ProtectedRoute component={Applications} allowedRoles={ALL_ROLES} />
-            </Route>
-
-            {/* Attendance */}
-            <Route path="/attendance">
-              <ProtectedRoute component={Attendance} allowedRoles={ALL_ROLES} />
-            </Route>
-
-            {/* Certificates */}
-            <Route path="/certificates">
-              <ProtectedRoute component={Certificates} allowedRoles={ALL_ROLES} />
-            </Route>
-
-            {/* Leaderboard */}
-            <Route path="/leaderboard">
-              <ProtectedRoute component={Leaderboard} allowedRoles={ALL_ROLES} />
-            </Route>
-
-            {/* Reports (staff only) */}
-            <Route path="/reports">
-              <ProtectedRoute component={Reports} allowedRoles={STAFF} />
-            </Route>
-
-            {/* Skills (admin only) */}
-            <Route path="/skills">
-              <ProtectedRoute component={Skills} allowedRoles={ADMIN} />
-            </Route>
-
-            {/* Staff creation (admin only) */}
-            <Route path="/staff/new">
-              <ProtectedRoute component={StaffNew} allowedRoles={ADMIN} />
-            </Route>
-
-            <Route component={NotFound} />
-          </Switch>
-        </Layout>
-      </Route>
+      <Route component={NotFound} />
     </Switch>
   );
-}
-
-function createQueryClient(onUnauthorized: () => void) {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: (failureCount, error: any) => {
-          if (error?.status === 401 || error?.response?.status === 401) {
-            onUnauthorized();
-            return false;
-          }
-          return failureCount < 1;
-        },
-        refetchOnWindowFocus: false,
-      },
-      mutations: {
-        onError: (error: any) => {
-          if (error?.status === 401 || error?.response?.status === 401) {
-            onUnauthorized();
-          }
-        },
-      },
-    },
-  });
 }
 
 function AppProviders() {
@@ -193,7 +176,31 @@ function AppProviders() {
     window.location.href = "/login";
   };
 
-  const queryClient = createQueryClient(handleUnauthorized);
+  const queryClient = useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: (failureCount, error: any) => {
+              if (error?.status === 401 || error?.response?.status === 401) {
+                handleUnauthorized();
+                return false;
+              }
+              return failureCount < 1;
+            },
+            refetchOnWindowFocus: false,
+          },
+          mutations: {
+            onError: (error: any) => {
+              if (error?.status === 401 || error?.response?.status === 401) {
+                handleUnauthorized();
+              }
+            },
+          },
+        },
+      }),
+    []
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
