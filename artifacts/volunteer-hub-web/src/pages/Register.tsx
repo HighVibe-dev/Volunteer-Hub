@@ -44,8 +44,14 @@ export default function Register() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    const payload = {
+      name: `${values.firstName} ${values.lastName}`.trim(),
+      email: values.email,
+      password: values.password,
+      phone: values.phone,
+    };
     registerMutation.mutate(
-      { data: values },
+      { data: payload as any },
       {
         onSuccess: (data) => {
           login(data);

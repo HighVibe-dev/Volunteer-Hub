@@ -29,6 +29,13 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
+function splitName(fullName: string): { firstName: string; lastName: string } {
+  const parts = (fullName ?? "").trim().split(/\s+/);
+  const firstName = parts[0] ?? "";
+  const lastName = parts.slice(1).join(" ") || "";
+  return { firstName, lastName };
+}
+
 function buildUserFromResponse(data: AuthResponse): User {
   const claims = decodeJwtPayload(data.accessToken);
   const claimedRole = (claims?.role ?? claims?.authorities ?? null) as string | null;
@@ -36,12 +43,18 @@ function buildUserFromResponse(data: AuthResponse): User {
     VALID_ROLES.includes(claimedRole as AuthResponseRole)
       ? (claimedRole as AuthResponseRole)
       : data.role;
+
+  const rawName = (data as any).name as string | undefined;
+  const { firstName, lastName } = rawName
+    ? splitName(rawName)
+    : { firstName: data.firstName ?? "", lastName: data.lastName ?? "" };
+
   return {
     userId: (claims?.userId as number | undefined) ?? data.userId,
     email: (claims?.sub as string | undefined) ?? data.email,
     role: validatedRole,
-    firstName: data.firstName,
-    lastName: data.lastName,
+    firstName,
+    lastName,
   };
 }
 
