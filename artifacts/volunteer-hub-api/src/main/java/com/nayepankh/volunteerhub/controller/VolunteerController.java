@@ -30,15 +30,22 @@ public class VolunteerController {
     private final VolunteerService volunteerService;
     private final JwtUtil jwtUtil;
 
+    /**
+     * GET /volunteers — admin/coordinator only.
+     * Supports: ?search=&city=&availability=&skillId=&page=&size=
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
-    @Operation(summary = "List all volunteers (admin/coordinator only)")
+    @Operation(summary = "List volunteers — filter by city, availability, skillId, or free-text search")
     public ResponseEntity<ApiResponse<Page<VolunteerResponse>>> list(
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String availability,
+            @RequestParam(required = false) Long skillId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(ApiResponse.success(
-                volunteerService.getAllVolunteers(search,
+                volunteerService.getAllVolunteers(search, city, availability, skillId,
                         PageRequest.of(page, size, Sort.by("createdAt").descending()))));
     }
 
@@ -118,7 +125,6 @@ public class VolunteerController {
         return null;
     }
 
-    /** Only the account owner may perform this action. */
     private void requireSelf(Long targetId, HttpServletRequest req) {
         Long callerId = callerUserId(req);
         if (callerId == null || !callerId.equals(targetId)) {
@@ -126,7 +132,6 @@ public class VolunteerController {
         }
     }
 
-    /** The account owner, an ADMIN, or a COORDINATOR may read this data. */
     private void requireSelfOrStaff(Long targetId, HttpServletRequest req) {
         Long callerId = callerUserId(req);
         String role = callerRole(req);

@@ -10,6 +10,7 @@ import com.nayepankh.volunteerhub.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -36,10 +37,11 @@ public class DashboardService {
         LocalDateTime since = LocalDateTime.now().minusMonths(12);
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM yyyy");
 
+        // Native queries return java.sql.Timestamp for date columns — convert to LocalDateTime
         List<DashboardStatsResponse.MonthlyDataPoint> growthData =
                 userRepository.countMonthlyVolunteerGrowth(since).stream()
                         .map(row -> DashboardStatsResponse.MonthlyDataPoint.builder()
-                                .month(((LocalDateTime) row[0]).format(fmt))
+                                .month(toLocalDateTime(row[0]).format(fmt))
                                 .value(((Number) row[1]).doubleValue())
                                 .build())
                         .collect(Collectors.toList());
@@ -47,7 +49,7 @@ public class DashboardService {
         List<DashboardStatsResponse.MonthlyDataPoint> hoursData =
                 attendanceRepository.sumMonthlyHours(since).stream()
                         .map(row -> DashboardStatsResponse.MonthlyDataPoint.builder()
-                                .month(((LocalDateTime) row[0]).format(fmt))
+                                .month(toLocalDateTime(row[0]).format(fmt))
                                 .value(row[1] != null ? ((Number) row[1]).doubleValue() : 0.0)
                                 .build())
                         .collect(Collectors.toList());
@@ -55,7 +57,7 @@ public class DashboardService {
         List<DashboardStatsResponse.MonthlyDataPoint> eventData =
                 eventRepository.countMonthlyEvents(since).stream()
                         .map(row -> DashboardStatsResponse.MonthlyDataPoint.builder()
-                                .month(((LocalDateTime) row[0]).format(fmt))
+                                .month(toLocalDateTime(row[0]).format(fmt))
                                 .value(((Number) row[1]).doubleValue())
                                 .build())
                         .collect(Collectors.toList());
@@ -83,7 +85,6 @@ public class DashboardService {
                         .build())
                 .collect(Collectors.toList());
 
-        // Attendance percentage: present / total attendance records
         long totalAttendanceRecords = attendanceRepository.count();
         long totalPresentRecords = attendanceRepository.countAllPresent();
         double attendancePct = totalAttendanceRecords > 0
@@ -111,10 +112,8 @@ public class DashboardService {
      */
     public List<LeaderboardEntry> getLeaderboard(int limit) {
         List<User> volunteers = userRepository.findByRole(Role.ROLE_VOLUNTEER);
-
         if (volunteers.isEmpty()) return List.of();
 
-        // Compute raw metrics
         Map<Long, Long> participationMap = new HashMap<>();
         Map<Long, Double> attendanceRateMap = new HashMap<>();
 
@@ -156,7 +155,6 @@ public class DashboardService {
                     .build());
         }
 
-        // Sort by score descending, then assign rank
         entries.sort(Comparator.comparingDouble(LeaderboardEntry::getScore).reversed());
 
         List<LeaderboardEntry> ranked = new ArrayList<>();
@@ -166,5 +164,22 @@ public class DashboardService {
             ranked.add(e);
         }
         return ranked;
+    }
+
+    /**
+     * Safely convert a native query date result to LocalDateTime.
+     * PostgreSQL DATE_TRUNC returns java.sql.Timestamp via JDBC.
+     */
+    private LocalDateTime toLocalDateTime(Object obj) {
+        if (obj instanceof Timestamp ts) {
+            return ts.toLocalDateTime();
+        }
+        if (obj instanceof LocalDateTime ldt) {
+            return ldt;
+        }
+        if (obj instanceof java.util.Date d) {
+            return new Timestamp(d.getTime()).toLocalDateTime();
+        }
+        return LocalDateTime.now();
     }
 }

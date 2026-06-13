@@ -1,23 +1,27 @@
 package com.nayepankh.volunteerhub.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
+@Slf4j
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${jwt.secret:}")
+    private String secretProperty;
 
     @Value("${jwt.expiration}")
     private long expiration;
@@ -25,9 +29,26 @@ public class JwtUtil {
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(java.util.Base64.getEncoder().encodeToString(secret.getBytes()));
-        return Keys.hmacShaKeyFor(keyBytes);
+    private SecretKey signingKey;
+
+    /**
+     * Initialize the signing key once at startup.
+     * If JWT_SECRET env var is not set, a random key is generated — tokens will be
+     * invalidated on every server restart. Always set JWT_SECRET in production.
+     */
+    @PostConstruct
+    public void init() {
+        if (secretProperty == null || secretProperty.isBlank()) {
+            String random = UUID.randomUUID().toString().replace("-", "")
+                    + UUID.randomUUID().toString().replace("-", "");
+            signingKey = Keys.hmacShaKeyFor(random.getBytes(StandardCharsets.UTF_8));
+            log.warn("[SECURITY] JWT_SECRET env var is not set. " +
+                     "Using a randomly generated ephemeral key — all sessions will be " +
+                     "invalidated on server restart. Set JWT_SECRET in production.");
+        } else {
+            byte[] keyBytes = secretProperty.getBytes(StandardCharsets.UTF_8);
+            signingKey = Keys.hmacShaKeyFor(keyBytes);
+        }
     }
 
     public String generateToken(UserDetails userDetails, String role, Long userId) {
@@ -47,7 +68,7 @@ public class JwtUtil {
                 .subject(subject)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + validity))
-                .signWith(getSigningKey())
+                .signWith(signingKey)
                 .compact();
     }
 
@@ -56,7 +77,11 @@ public class JwtUtil {
     }
 
     public Long extractUserId(String token) {
-        return extractClaim(token, claims -> claims.get("userId", Long.class));
+        return extractClaim(token, claims -> {
+            Object raw = claims.get("userId");
+            if (raw instanceof Number n) return n.longValue();
+            return null;
+        });
     }
 
     public String extractRole(String token) {
@@ -64,13 +89,12 @@ public class JwtUtil {
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        return claimsResolver.apply(extractAllClaims(token));
     }
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

@@ -8,6 +8,7 @@ import com.nayepankh.volunteerhub.exception.ResourceNotFoundException;
 import com.nayepankh.volunteerhub.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +27,31 @@ public class VolunteerService {
     private final CertificateRepository certificateRepository;
     private final EventApplicationRepository applicationRepository;
 
-    public Page<VolunteerResponse> getAllVolunteers(String search, Pageable pageable) {
+    /**
+     * List volunteers with optional filters:
+     *   - search: name/email text search
+     *   - city: exact city match (from VolunteerProfile)
+     *   - availability: exact availability string match (from VolunteerProfile)
+     *   - skillId: must have this skill in their VolunteerSkill list
+     */
+    public Page<VolunteerResponse> getAllVolunteers(
+            String search, String city, String availability, Long skillId, Pageable pageable) {
         Page<User> users;
-        if (search != null && !search.isBlank()) {
+        boolean hasFilter = (city != null && !city.isBlank())
+                || (availability != null && !availability.isBlank())
+                || skillId != null;
+
+        if (hasFilter) {
+            // Use an unsorted PageRequest for native queries — Hibernate would otherwise append
+            // camelCase field names (e.g. u.createdAt) that don't exist as SQL columns.
+            // The native query already orders by u.created_at DESC.
+            Pageable unsorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+            users = userRepository.filterVolunteers(
+                    (city != null && !city.isBlank()) ? city : null,
+                    (availability != null && !availability.isBlank()) ? availability : null,
+                    skillId,
+                    unsorted);
+        } else if (search != null && !search.isBlank()) {
             users = userRepository.searchVolunteers(Role.ROLE_VOLUNTEER, search, pageable);
         } else {
             users = userRepository.findByRole(Role.ROLE_VOLUNTEER, pageable);
@@ -102,6 +125,7 @@ public class VolunteerService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public VolunteerResponse toResponse(User user) {
         VolunteerProfile profile = profileRepository.findByUserId(user.getId()).orElse(null);
         List<SkillResponse> skills = volunteerSkillRepository.findByVolunteerId(user.getId()).stream()

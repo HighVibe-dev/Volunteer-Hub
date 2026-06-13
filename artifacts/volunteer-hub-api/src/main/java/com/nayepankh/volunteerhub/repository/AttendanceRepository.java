@@ -26,8 +26,15 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT SUM(a.totalHours) FROM Attendance a")
     Double sumAllHours();
 
-    @Query("SELECT a.checkInTime, SUM(a.totalHours) FROM Attendance a WHERE a.checkInTime >= :since " +
-           "GROUP BY FUNCTION('MONTH', a.checkInTime), FUNCTION('YEAR', a.checkInTime) ORDER BY a.checkInTime")
+    /**
+     * Monthly hours sum using native PostgreSQL DATE_TRUNC.
+     * Returns rows of [truncated_month (Timestamp), sum_hours (Double)].
+     */
+    @Query(value = "SELECT DATE_TRUNC('month', check_in_time) AS month, COALESCE(SUM(total_hours), 0) AS hours " +
+                   "FROM attendances WHERE check_in_time >= :since " +
+                   "GROUP BY DATE_TRUNC('month', check_in_time) " +
+                   "ORDER BY month",
+           nativeQuery = true)
     List<Object[]> sumMonthlyHours(@Param("since") LocalDateTime since);
 
     /** Count how many distinct events a volunteer attended (present=true). */

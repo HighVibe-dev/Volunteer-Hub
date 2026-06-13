@@ -19,7 +19,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE LOWER(e.title) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<Event> searchByTitle(@Param("search") String search, Pageable pageable);
 
-    @Query("SELECT e.createdAt, COUNT(e) FROM Event e WHERE e.createdAt >= :since GROUP BY FUNCTION('MONTH', e.createdAt), FUNCTION('YEAR', e.createdAt) ORDER BY e.createdAt")
+    /**
+     * Monthly event count using native PostgreSQL DATE_TRUNC.
+     * Returns rows of [truncated_month (Timestamp), count (Long)].
+     */
+    @Query(value = "SELECT DATE_TRUNC('month', created_at) AS month, COUNT(*) AS cnt " +
+                   "FROM events WHERE created_at >= :since " +
+                   "GROUP BY DATE_TRUNC('month', created_at) " +
+                   "ORDER BY month",
+           nativeQuery = true)
     List<Object[]> countMonthlyEvents(@Param("since") LocalDateTime since);
 
     @Query("SELECT e FROM Event e WHERE e.status = 'UPCOMING' OR e.status = 'ACTIVE' ORDER BY e.startDate ASC")

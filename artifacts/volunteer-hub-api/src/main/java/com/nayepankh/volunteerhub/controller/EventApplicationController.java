@@ -51,7 +51,7 @@ public class EventApplicationController {
     @Operation(summary = "Approve or reject an application (state-machine enforced)")
     public ResponseEntity<ApiResponse<EventApplicationResponse>> updateStatus(
             @PathVariable Long id,
-            @RequestParam ApplicationStatus status,
+            @RequestBody ApplicationStatus status,
             HttpServletRequest req) {
         Long coordinatorId = requireAuthenticatedUserId(req);
         return ResponseEntity.ok(ApiResponse.success("Status updated",

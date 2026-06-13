@@ -1,0 +1,27 @@
+kind = "api"
+previewPath = "/api"
+title = "NayePankh Volunteer Hub API"
+version = "1.0.0"
+id = "volunteer-hub-api"
+
+[[services]]
+localPort = 8099
+name = "NayePankh Volunteer Hub API"
+paths = ["/api"]
+
+[services.development]
+run = "cd artifacts/volunteer-hub-api && mvn spring-boot:run"
+
+[services.production]
+
+[services.production.build]
+args = ["mvn", "-f", "artifacts/volunteer-hub-api/pom.xml", "package", "-DskipTests", "-q"]
+
+[services.production.run]
+args = ["java", "-jar", "artifacts/volunteer-hub-api/target/volunteer-hub-0.0.1-SNAPSHOT.jar"]
+
+[services.production.run.env]
+PORT = "8099"
+
+[services.production.health.startup]
+path = "/api/health"
