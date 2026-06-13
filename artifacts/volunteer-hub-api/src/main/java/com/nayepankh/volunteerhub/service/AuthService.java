@@ -7,6 +7,7 @@ import com.nayepankh.volunteerhub.entity.User;
 import com.nayepankh.volunteerhub.entity.VolunteerProfile;
 import com.nayepankh.volunteerhub.enums.Role;
 import com.nayepankh.volunteerhub.exception.BadRequestException;
+import com.nayepankh.volunteerhub.exception.UnauthorizedException;
 import com.nayepankh.volunteerhub.repository.UserRepository;
 import com.nayepankh.volunteerhub.repository.VolunteerProfileRepository;
 import com.nayepankh.volunteerhub.security.JwtUtil;
@@ -31,42 +32,63 @@ public class AuthService {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuditLogService auditLogService;
 
+    /**
+     * Public self-registration — ALWAYS creates ROLE_VOLUNTEER.
+     * Admins/Coordinators must be provisioned via createStaffUser() by an existing admin.
+     */
     @Transactional
     public AuthResponse register(RegisterRequest req) {
         if (userRepository.existsByEmail(req.getEmail())) {
             throw new BadRequestException("Email already registered");
         }
 
-        Role role = req.getRole() != null ? req.getRole() : Role.ROLE_VOLUNTEER;
-
         User user = User.builder()
                 .name(req.getName())
                 .email(req.getEmail())
                 .phone(req.getPhone())
                 .password(passwordEncoder.encode(req.getPassword()))
-                .role(role)
+                .role(Role.ROLE_VOLUNTEER)
                 .build();
         user = userRepository.save(user);
 
-        if (role == Role.ROLE_VOLUNTEER) {
-            VolunteerProfile profile = VolunteerProfile.builder().user(user).build();
-            profileRepository.save(profile);
-        }
+        VolunteerProfile profile = VolunteerProfile.builder().user(user).build();
+        profileRepository.save(profile);
 
         UserDetails details = userDetailsService.loadUserByUsername(user.getEmail());
         String accessToken = jwtUtil.generateToken(details, user.getRole().name(), user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(details);
 
-        auditLogService.log(user.getId(), "USER_REGISTERED", "New user: " + user.getEmail());
+        auditLogService.log(user.getId(), "USER_REGISTERED", "New volunteer: " + user.getEmail());
 
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .userId(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole().name())
+        return buildResponse(accessToken, refreshToken, user);
+    }
+
+    /**
+     * Admin-only: create a staff account (COORDINATOR or ADMIN).
+     * Caller must already be authenticated as ROLE_ADMIN (enforced in controller).
+     */
+    @Transactional
+    public AuthResponse createStaffUser(RegisterRequest req, Long adminId) {
+        if (req.getRole() == null || req.getRole() == Role.ROLE_VOLUNTEER) {
+            throw new BadRequestException("Staff role must be COORDINATOR or ADMIN");
+        }
+        if (userRepository.existsByEmail(req.getEmail())) {
+            throw new BadRequestException("Email already registered");
+        }
+        User user = User.builder()
+                .name(req.getName())
+                .email(req.getEmail())
+                .phone(req.getPhone())
+                .password(passwordEncoder.encode(req.getPassword()))
+                .role(req.getRole())
                 .build();
+        user = userRepository.save(user);
+        auditLogService.log(adminId, "STAFF_CREATED", "New " + req.getRole() + ": " + user.getEmail());
+
+        UserDetails details = userDetailsService.loadUserByUsername(user.getEmail());
+        String accessToken = jwtUtil.generateToken(details, user.getRole().name(), user.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(details);
+        return buildResponse(accessToken, refreshToken, user);
     }
 
     public AuthResponse login(LoginRequest req) {
@@ -80,14 +102,7 @@ public class AuthService {
 
         auditLogService.log(user.getId(), "USER_LOGIN", "Login: " + user.getEmail());
 
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .userId(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole().name())
-                .build();
+        return buildResponse(accessToken, refreshToken, user);
     }
 
     public AuthResponse refresh(String refreshToken) {
@@ -95,9 +110,13 @@ public class AuthService {
         User user = userRepository.findByEmail(email).orElseThrow();
         UserDetails details = userDetailsService.loadUserByUsername(email);
         String newAccess = jwtUtil.generateToken(details, user.getRole().name(), user.getId());
+        return buildResponse(newAccess, refreshToken, user);
+    }
+
+    private AuthResponse buildResponse(String access, String refresh, User user) {
         return AuthResponse.builder()
-                .accessToken(newAccess)
-                .refreshToken(refreshToken)
+                .accessToken(access)
+                .refreshToken(refresh)
                 .userId(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())

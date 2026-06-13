@@ -1,7 +1,6 @@
 package com.nayepankh.volunteerhub.controller;
 
-import com.nayepankh.volunteerhub.dto.event.EventRequest;
-import com.nayepankh.volunteerhub.dto.event.EventResponse;
+import com.nayepankh.volunteerhub.dto.event.*;
 import com.nayepankh.volunteerhub.dto.volunteer.VolunteerResponse;
 import com.nayepankh.volunteerhub.security.JwtUtil;
 import com.nayepankh.volunteerhub.service.EventService;
@@ -32,7 +31,7 @@ public class EventController {
     private final JwtUtil jwtUtil;
 
     @GetMapping
-    @Operation(summary = "List all events")
+    @Operation(summary = "List all events (paginated)")
     public ResponseEntity<ApiResponse<Page<EventResponse>>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -52,8 +51,8 @@ public class EventController {
     public ResponseEntity<ApiResponse<EventResponse>> create(
             @Valid @RequestBody EventRequest req,
             HttpServletRequest httpReq) {
-        Long userId = extractUserId(httpReq);
-        return ResponseEntity.ok(ApiResponse.success("Event created", eventService.createEvent(req, userId)));
+        return ResponseEntity.ok(ApiResponse.success("Event created",
+                eventService.createEvent(req, extractUserId(httpReq))));
     }
 
     @PutMapping("/{id}")
@@ -63,21 +62,38 @@ public class EventController {
             @PathVariable Long id,
             @RequestBody EventRequest req,
             HttpServletRequest httpReq) {
-        Long userId = extractUserId(httpReq);
-        return ResponseEntity.ok(ApiResponse.success("Event updated", eventService.updateEvent(id, req, userId)));
+        return ResponseEntity.ok(ApiResponse.success("Event updated",
+                eventService.updateEvent(id, req, extractUserId(httpReq))));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete an event")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id, HttpServletRequest httpReq) {
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable Long id,
+            HttpServletRequest httpReq) {
         eventService.deleteEvent(id, extractUserId(httpReq));
         return ResponseEntity.ok(ApiResponse.success("Event deleted", null));
     }
 
+    /**
+     * POST /events/{id}/requirements
+     * Add or replace skill requirements for an existing event.
+     */
+    @PostMapping("/{id}/requirements")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
+    @Operation(summary = "Add/replace skill requirements for an event")
+    public ResponseEntity<ApiResponse<EventResponse>> setRequirements(
+            @PathVariable Long id,
+            @RequestBody List<EventRequirementRequest> requirements,
+            HttpServletRequest httpReq) {
+        return ResponseEntity.ok(ApiResponse.success("Requirements updated",
+                eventService.addRequirements(id, requirements, extractUserId(httpReq))));
+    }
+
     @GetMapping("/{id}/recommended-volunteers")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
-    @Operation(summary = "Get skill-matched volunteer recommendations for an event")
+    @Operation(summary = "Get skill + participation + attendance ranked volunteers for an event")
     public ResponseEntity<ApiResponse<List<VolunteerResponse>>> recommend(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(eventService.getRecommendedVolunteers(id)));
     }

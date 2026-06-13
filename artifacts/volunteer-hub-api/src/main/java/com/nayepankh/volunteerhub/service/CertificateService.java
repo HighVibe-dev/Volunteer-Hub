@@ -1,18 +1,18 @@
 package com.nayepankh.volunteerhub.service;
 
 import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.nayepankh.volunteerhub.dto.certificate.CertificateResponse;
 import com.nayepankh.volunteerhub.entity.*;
 import com.nayepankh.volunteerhub.enums.ApplicationStatus;
 import com.nayepankh.volunteerhub.exception.ResourceNotFoundException;
+import com.nayepankh.volunteerhub.exception.UnauthorizedException;
 import com.nayepankh.volunteerhub.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,6 +35,12 @@ public class CertificateService {
     private final NotificationService notificationService;
     private final AuditLogService auditLogService;
 
+    /**
+     * Generate certificates for volunteers who are:
+     *   1. APPROVED in EventApplication, AND
+     *   2. Marked present=true in Attendance
+     * Volunteers who were approved but did not actually attend do NOT receive a certificate.
+     */
     @Transactional
     public List<CertificateResponse> generateForEvent(Long eventId, Long adminId) {
         Event event = eventRepository.findById(eventId)
@@ -46,13 +52,19 @@ public class CertificateService {
         List<CertificateResponse> results = new ArrayList<>();
         for (EventApplication app : approved) {
             User volunteer = app.getVolunteer();
-            if (certificateRepository.existsByVolunteerIdAndEventId(volunteer.getId(), eventId)) {
-                continue;
+
+            // Require confirmed attendance (present=true)
+            Optional<Attendance> attendanceOpt = attendanceRepository
+                    .findByVolunteerIdAndEventId(volunteer.getId(), eventId);
+            if (attendanceOpt.isEmpty() || !attendanceOpt.get().isPresent()) {
+                continue; // skip — did not actually attend
             }
 
-            double hours = attendanceRepository
-                    .findByVolunteerIdAndEventId(volunteer.getId(), eventId)
-                    .map(Attendance::getTotalHours).orElse(0.0);
+            if (certificateRepository.existsByVolunteerIdAndEventId(volunteer.getId(), eventId)) {
+                continue; // already generated
+            }
+
+            double hours = attendanceOpt.get().getTotalHours();
 
             byte[] pdf = generatePdf(volunteer.getName(), event.getTitle(), hours,
                     event.getStartDate() != null
@@ -76,16 +88,28 @@ public class CertificateService {
         return results;
     }
 
+    /**
+     * List certificates for a given volunteer — caller must be that volunteer or an admin/coordinator.
+     */
     public List<CertificateResponse> getVolunteerCertificates(Long volunteerId) {
         return certificateRepository.findByVolunteerId(volunteerId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
+    /**
+     * Download a certificate PDF — caller must own the certificate or be admin/coordinator.
+     * Ownership enforcement is done in the controller.
+     */
     public byte[] downloadCertificate(Long certId) {
         Certificate cert = certificateRepository.findById(certId)
                 .orElseThrow(() -> new ResourceNotFoundException("Certificate", certId));
-        if (cert.getPdfData() != null) return cert.getPdfData();
+        if (cert.getPdfData() != null && cert.getPdfData().length > 0) return cert.getPdfData();
         return generatePdf(cert.getVolunteer().getName(), cert.getEvent().getTitle(), 0, "N/A");
+    }
+
+    public Certificate getCertificateById(Long id) {
+        return certificateRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Certificate", id));
     }
 
     private byte[] generatePdf(String volunteerName, String eventTitle, double hours, String date) {
@@ -93,7 +117,6 @@ public class CertificateService {
             PdfWriter writer = new PdfWriter(baos);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf, PageSize.A4.rotate());
-
             document.setMargins(40, 60, 40, 60);
 
             document.add(new Paragraph("NAYE PANKH FOUNDATION")
@@ -116,7 +139,7 @@ public class CertificateService {
             document.add(new Paragraph(volunteerName)
                     .setFontSize(24).setBold()
                     .setTextAlignment(TextAlignment.CENTER)
-                    .setFontColor(new com.itextpdf.kernel.colors.DeviceRgb(0, 102, 204)));
+                    .setFontColor(new DeviceRgb(0, 102, 204)));
 
             document.add(new Paragraph("has successfully volunteered in the event")
                     .setFontSize(13).setTextAlignment(TextAlignment.CENTER));

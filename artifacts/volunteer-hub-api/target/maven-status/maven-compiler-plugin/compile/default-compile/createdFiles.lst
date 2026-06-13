@@ -29,6 +29,7 @@ com/nayepankh/volunteerhub/controller/AttendanceController.class
 com/nayepankh/volunteerhub/service/EventApplicationService.class
 com/nayepankh/volunteerhub/dto/volunteer/VolunteerResponse$VolunteerResponseBuilder.class
 com/nayepankh/volunteerhub/service/NotificationService.class
+com/nayepankh/volunteerhub/service/EventApplicationService$1.class
 com/nayepankh/volunteerhub/repository/VolunteerProfileRepository.class
 com/nayepankh/volunteerhub/dto/event/EventResponse.class
 com/nayepankh/volunteerhub/dto/event/EventRequirementRequest.class

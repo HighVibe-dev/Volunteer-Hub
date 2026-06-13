@@ -26,6 +26,19 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT SUM(a.totalHours) FROM Attendance a")
     Double sumAllHours();
 
-    @Query("SELECT a.checkInTime, SUM(a.totalHours) FROM Attendance a WHERE a.checkInTime >= :since GROUP BY FUNCTION('MONTH', a.checkInTime), FUNCTION('YEAR', a.checkInTime) ORDER BY a.checkInTime")
+    @Query("SELECT a.checkInTime, SUM(a.totalHours) FROM Attendance a WHERE a.checkInTime >= :since " +
+           "GROUP BY FUNCTION('MONTH', a.checkInTime), FUNCTION('YEAR', a.checkInTime) ORDER BY a.checkInTime")
     List<Object[]> sumMonthlyHours(@Param("since") LocalDateTime since);
+
+    /** Count how many distinct events a volunteer attended (present=true). */
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.volunteer.id = :volunteerId AND a.present = true")
+    long countEventsAttendedByVolunteerId(@Param("volunteerId") Long volunteerId);
+
+    /** Count total events a volunteer was checked into (present or absent). */
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.volunteer.id = :volunteerId")
+    long countTotalAttendanceByVolunteerId(@Param("volunteerId") Long volunteerId);
+
+    /** Count all present=true records across all volunteers (for dashboard %). */
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.present = true")
+    long countAllPresent();
 }
