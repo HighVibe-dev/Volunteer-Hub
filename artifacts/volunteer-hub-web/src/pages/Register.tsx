@@ -10,6 +10,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { getRoleDashboardPath } from "@/App";
+import { AuthHeroPanel } from "@/components/auth/AuthHeroPanel";
+import { Mail, Lock, User, Phone, MapPin } from "lucide-react";
+import "@/components/auth/auth.css";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -62,114 +65,179 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-primary text-primary-foreground rounded-lg flex items-center justify-center mb-4">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m8 17 4 4 4-4"></path></svg>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <AuthHeroPanel />
+
+      <div className="auth-right-panel">
+        <div className="auth-right-inner" style={{ maxWidth: "30rem" }}>
+          {/* Mobile branded header */}
+          <div className="auth-mobile-logo">
+            <img src="/nayepankh-logo.png" alt="NayePankh" />
+            <div className="auth-mobile-logo-text">
+              <strong>NayePankh Foundation</strong>
+              <span>Volunteer Hub Platform</span>
+            </div>
           </div>
-          <h2 className="text-3xl font-extrabold text-foreground">Join NayePankh</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Register as a volunteer and start making an impact
-          </p>
-        </div>
-        
-        <div className="bg-card p-8 rounded-xl border shadow-sm">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
+
+          {/* Heading */}
+          <div className="auth-right-heading">
+            <h2>Join NayePankh 🌟</h2>
+            <p>Register as a volunteer and start making an impact in your community.</p>
+          </div>
+
+          <div className="auth-card">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+                {/* First / Last name row */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                  <FormField control={form.control} name="firstName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} data-testid="input-firstname" />
+                        <div className="auth-input-wrapper">
+                          <User className="auth-input-icon" aria-hidden="true" />
+                          <Input
+                            placeholder="John"
+                            {...field}
+                            data-testid="input-firstname"
+                            className="auth-input-field"
+                            aria-label="First name"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
+                  )} />
+                  <FormField control={form.control} name="lastName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Doe" {...field} data-testid="input-lastname" />
+                        <div className="auth-input-wrapper">
+                          <User className="auth-input-icon" aria-hidden="true" />
+                          <Input
+                            placeholder="Doe"
+                            {...field}
+                            data-testid="input-lastname"
+                            className="auth-input-field"
+                            aria-label="Last name"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
+                  )} />
+                </div>
+
+                <FormField control={form.control} name="email" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Email address</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} data-testid="input-email" />
+                      <div className="auth-input-wrapper">
+                        <Mail className="auth-input-icon" aria-hidden="true" />
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          {...field}
+                          data-testid="input-email"
+                          autoComplete="email"
+                          className="auth-input-field"
+                          aria-label="Email address"
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
+                )} />
+
+                <FormField control={form.control} name="password" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
+                      <div className="auth-input-wrapper">
+                        <Lock className="auth-input-icon" aria-hidden="true" />
+                        <Input
+                          type="password"
+                          placeholder="Min. 6 characters"
+                          {...field}
+                          data-testid="input-password"
+                          autoComplete="new-password"
+                          className="auth-input-field"
+                          aria-label="Password"
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
+                )} />
+
+                <FormField control={form.control} name="phone" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="+91 9876543210" {...field} data-testid="input-phone" />
+                      <div className="auth-input-wrapper">
+                        <Phone className="auth-input-icon" aria-hidden="true" />
+                        <Input
+                          placeholder="+91 9876543210"
+                          {...field}
+                          data-testid="input-phone"
+                          className="auth-input-field"
+                          aria-label="Phone number"
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="City, State" {...field} data-testid="input-address" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full mt-6" disabled={isLoading} data-testid="btn-register">
-                {isLoading ? "Creating account..." : "Create Account"}
-              </Button>
-            </form>
-          </Form>
-        </div>
+                )} />
 
-        <p className="text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <Link href="/login" className="font-medium text-primary hover:underline">
-            Sign in
-          </Link>
-        </p>
+                <FormField control={form.control} name="address" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address <span style={{ color: "var(--color-muted-foreground)", fontWeight: 400 }}>(Optional)</span></FormLabel>
+                    <FormControl>
+                      <div className="auth-input-wrapper">
+                        <MapPin className="auth-input-icon" aria-hidden="true" />
+                        <Input
+                          placeholder="City, State"
+                          {...field}
+                          data-testid="input-address"
+                          className="auth-input-field"
+                          aria-label="Address (optional)"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <Button
+                  type="submit"
+                  className="auth-submit-btn w-full"
+                  disabled={isLoading}
+                  data-testid="btn-register"
+                  style={{ marginTop: "0.375rem" }}
+                >
+                  {isLoading ? "Creating account…" : "Create Account"}
+                </Button>
+              </form>
+            </Form>
+
+            {/* Mini trust row */}
+            <div style={{ marginTop: "1rem", display: "flex", justifyContent: "center", gap: "1.25rem", flexWrap: "wrap" }}>
+              {["🔒 Secure", "✅ Verified NGO", "🏛️ Govt. Registered"].map((t) => (
+                <span key={t} style={{ fontSize: "0.7rem", color: "var(--color-muted-foreground)", fontWeight: 500 }}>{t}</span>
+              ))}
+            </div>
+          </div>
+
+          <p className="auth-bottom-link">
+            Already have an account?{" "}
+            <Link href="/login" style={{ fontWeight: 600, color: "#EE7F31", textDecoration: "none" }}
+              onMouseOver={(e) => (e.currentTarget.style.textDecoration = "underline")}
+              onMouseOut={(e) => (e.currentTarget.style.textDecoration = "none")}
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
