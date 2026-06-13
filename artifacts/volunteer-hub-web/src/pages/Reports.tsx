@@ -17,7 +17,19 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { exportToCSV } from "@/lib/export-csv";
+import api from "@/lib/api";
+
+async function downloadReportCsv(endpoint: string, filename: string) {
+  const res = await api.get(`/reports/${endpoint}?format=csv&size=100`, {
+    responseType: "blob",
+  });
+  const url = URL.createObjectURL(res.data as Blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const COLORS = ["#EE7F31", "#3F746A", "#E8C547", "#6366F1", "#EC4899", "#14B8A6"];
 
@@ -34,26 +46,7 @@ function ParticipationReport() {
       events: v.eventsAttended,
     })) ?? [];
 
-  const handleExport = () => {
-    if (!data?.content) return;
-    exportToCSV(
-      data.content.map((v) => ({
-        firstName: v.firstName,
-        lastName: v.lastName,
-        email: v.email,
-        eventsAttended: v.eventsAttended,
-        totalHoursLogged: v.totalHoursLogged,
-      })),
-      "volunteer-participation-report",
-      {
-        firstName: "First Name",
-        lastName: "Last Name",
-        email: "Email",
-        eventsAttended: "Events Attended",
-        totalHoursLogged: "Total Hours Logged",
-      }
-    );
-  };
+  const handleExport = () => downloadReportCsv("volunteers", "volunteer-participation-report");
 
   if (isLoading) return <Skeleton className="h-80 w-full" />;
 
@@ -131,24 +124,7 @@ function AttendanceReport() {
       rate: Math.round(e.checkInRate * 100),
     })) ?? [];
 
-  const handleExport = () => {
-    if (!data) return;
-    exportToCSV(
-      data.map((e) => ({
-        eventTitle: e.eventTitle,
-        totalCheckedIn: e.totalCheckedIn,
-        totalHours: e.totalHours,
-        checkInRate: `${(e.checkInRate * 100).toFixed(1)}%`,
-      })),
-      "attendance-report",
-      {
-        eventTitle: "Event",
-        totalCheckedIn: "Checked In",
-        totalHours: "Total Hours",
-        checkInRate: "Check-in Rate",
-      }
-    );
-  };
+  const handleExport = () => downloadReportCsv("attendance", "attendance-report");
 
   if (isLoading) return <Skeleton className="h-80 w-full" />;
 
@@ -222,24 +198,7 @@ function EventsReport() {
   }, {});
   const pieData = Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
 
-  const handleExport = () => {
-    if (!data) return;
-    exportToCSV(
-      data.map((e) => ({
-        title: e.title,
-        status: e.status,
-        participantCount: e.participantCount,
-        hoursLogged: e.hoursLogged,
-      })),
-      "events-report",
-      {
-        title: "Event Title",
-        status: "Status",
-        participantCount: "Participants",
-        hoursLogged: "Hours Logged",
-      }
-    );
-  };
+  const handleExport = () => downloadReportCsv("events", "events-report");
 
   if (isLoading) return <Skeleton className="h-80 w-full" />;
 
@@ -323,22 +282,7 @@ function SkillDistribution() {
 
   const pieData = data?.slice(0, 8).map((s) => ({ name: s.skillName, value: s.volunteerCount })) ?? [];
 
-  const handleExport = () => {
-    if (!data) return;
-    exportToCSV(
-      data.map((s) => ({
-        skillName: s.skillName,
-        volunteerCount: s.volunteerCount,
-        percentage: `${s.percentage.toFixed(1)}%`,
-      })),
-      "skill-distribution-report",
-      {
-        skillName: "Skill",
-        volunteerCount: "Volunteer Count",
-        percentage: "Percentage",
-      }
-    );
-  };
+  const handleExport = () => downloadReportCsv("skills", "skill-distribution-report");
 
   if (isLoading) return <Skeleton className="h-80 w-full" />;
 

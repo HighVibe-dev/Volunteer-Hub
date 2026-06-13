@@ -31,15 +31,21 @@ export default function Volunteers() {
   const [status, setStatus] = useState<string>("all");
   const [skill, setSkill] = useState("");
   const [debouncedSkill, setDebouncedSkill] = useState("");
+  const [city, setCity] = useState("");
+  const [debouncedCity, setDebouncedCity] = useState("");
+  const [availability, setAvailability] = useState("");
+  const [debouncedAvailability, setDebouncedAvailability] = useState("");
   const qc = useQueryClient();
   const { toast } = useToast();
 
-  const params: ListVolunteersParams = {
+  const params: ListVolunteersParams & { city?: string; availability?: string } = {
     page,
     size: 20,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(status && status !== "all" ? { status: status as typeof ListVolunteersStatus[keyof typeof ListVolunteersStatus] } : {}),
     ...(debouncedSkill ? { skill: debouncedSkill } : {}),
+    ...(debouncedCity ? { city: debouncedCity } : {}),
+    ...(debouncedAvailability ? { availability: debouncedAvailability } : {}),
   };
 
   const { data, isLoading } = useListVolunteers(params, {
@@ -68,6 +74,24 @@ export default function Volunteers() {
     clearTimeout((window as any).__vskillTimer);
     (window as any).__vskillTimer = setTimeout(() => {
       setDebouncedSkill(val);
+      setPage(0);
+    }, 300);
+  };
+
+  const handleCityFilter = (val: string) => {
+    setCity(val);
+    clearTimeout((window as any).__vcityTimer);
+    (window as any).__vcityTimer = setTimeout(() => {
+      setDebouncedCity(val);
+      setPage(0);
+    }, 300);
+  };
+
+  const handleAvailabilityFilter = (val: string) => {
+    setAvailability(val);
+    clearTimeout((window as any).__vavailTimer);
+    (window as any).__vavailTimer = setTimeout(() => {
+      setDebouncedAvailability(val);
       setPage(0);
     }, 300);
   };
@@ -112,10 +136,24 @@ export default function Volunteers() {
         </div>
         <Input
           placeholder="Filter by skill..."
-          className="w-48"
+          className="w-40"
           value={skill}
           onChange={(e) => handleSkillFilter(e.target.value)}
           data-testid="input-volunteer-skill"
+        />
+        <Input
+          placeholder="Filter by city..."
+          className="w-36"
+          value={city}
+          onChange={(e) => handleCityFilter(e.target.value)}
+          data-testid="input-volunteer-city"
+        />
+        <Input
+          placeholder="Availability..."
+          className="w-36"
+          value={availability}
+          onChange={(e) => handleAvailabilityFilter(e.target.value)}
+          data-testid="input-volunteer-availability"
         />
         <Select value={status} onValueChange={handleStatusChange}>
           <SelectTrigger className="w-40" data-testid="select-volunteer-status">

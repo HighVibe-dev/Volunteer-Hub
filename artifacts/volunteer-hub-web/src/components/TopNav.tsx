@@ -130,7 +130,12 @@ function NotificationsDropdown() {
                   "flex items-start gap-2 px-4 py-3 border-b last:border-0 cursor-pointer transition-colors",
                   notif.read ? "hover:bg-muted/50" : "bg-primary/5 hover:bg-primary/10"
                 )}
-                onClick={() => navigateToRelated(notif.type, notif.relatedEntityId)}
+                onClick={() => {
+                  if (!notif.read) {
+                    markRead.mutate({ notificationId: notif.id }, { onSuccess: invalidateNotifications });
+                  }
+                  navigateToRelated(notif.type, notif.relatedEntityId);
+                }}
                 data-testid={`notification-${notif.id}`}
               >
                 <div className="flex-1 min-w-0 mt-0.5">
