@@ -59,10 +59,14 @@ export default function Register() {
           setLocation(getRoleDashboardPath(data.role));
         },
         onError: (error: any) => {
+          const msg =
+            error?.response?.data?.message ||
+            error?.message ||
+            "Please check your information and try again.";
           toast({
             variant: "destructive",
             title: "Registration failed",
-            description: error.response?.data?.message || "Please check your information and try again.",
+            description: msg,
           });
           setIsLoading(false);
         },

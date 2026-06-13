@@ -36,23 +36,27 @@ function splitName(fullName: string): { firstName: string; lastName: string } {
   return { firstName, lastName };
 }
 
+function normaliseRole(raw: string | null | undefined): AuthResponseRole {
+  if (!raw) return "VOLUNTEER";
+  const stripped = raw.replace(/^ROLE_/i, "") as AuthResponseRole;
+  return VALID_ROLES.includes(stripped) ? stripped : "VOLUNTEER";
+}
+
 function buildUserFromResponse(data: AuthResponse): User {
   const claims = decodeJwtPayload(data.accessToken);
-  const claimedRole = (claims?.role ?? claims?.authorities ?? null) as string | null;
-  const validatedRole: AuthResponseRole =
-    VALID_ROLES.includes(claimedRole as AuthResponseRole)
-      ? (claimedRole as AuthResponseRole)
-      : data.role;
 
   const rawName = (data as any).name as string | undefined;
   const { firstName, lastName } = rawName
     ? splitName(rawName)
     : { firstName: data.firstName ?? "", lastName: data.lastName ?? "" };
 
+  const claimedRole = (claims?.role ?? claims?.authorities ?? null) as string | null;
+  const role = normaliseRole(claimedRole || (data.role as string));
+
   return {
     userId: (claims?.userId as number | undefined) ?? data.userId,
     email: (claims?.sub as string | undefined) ?? data.email,
-    role: validatedRole,
+    role,
     firstName,
     lastName,
   };
@@ -79,9 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const claimedRole = (claims.role ?? claims.authorities ?? null) as string | null;
           return {
             ...base,
-            role: VALID_ROLES.includes(claimedRole as AuthResponseRole)
-              ? (claimedRole as AuthResponseRole)
-              : base.role,
+            role: normaliseRole(claimedRole || (base.role as string)),
           };
         }
         return base;
