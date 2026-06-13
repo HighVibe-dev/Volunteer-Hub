@@ -1,4 +1,5 @@
 import { useRoute, Link } from "wouter";
+import { useState } from "react";
 import {
   useGetEvent,
   getGetEventQueryKey,
@@ -21,7 +22,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, CalendarDays, MapPin, Users, Clock, Award, Edit } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { ArrowLeft, CalendarDays, MapPin, Users, Clock, Award, Edit, LogIn, LogOut } from "lucide-react";
+
+interface CheckOutState {
+  attendanceId: number;
+  volunteerName: string;
+  checkIn: string;
+}
 
 export default function EventDetail() {
   const [, params] = useRoute("/events/:id");
@@ -30,6 +42,11 @@ export default function EventDetail() {
   const qc = useQueryClient();
   const { toast } = useToast();
   const isStaff = user?.role === "ADMIN" || user?.role === "COORDINATOR";
+
+  const [checkOutDialog, setCheckOutDialog] = useState<CheckOutState | null>(null);
+  const [checkOutTime, setCheckOutTime] = useState("");
+  const [hoursLogged, setHoursLogged] = useState("");
+  const updateAttendanceMutation = useUpdateAttendance();
 
   const { data: event, isLoading } = useGetEvent(eventId, {
     query: { enabled: !!eventId, queryKey: getGetEventQueryKey(eventId) },
@@ -77,6 +94,27 @@ export default function EventDetail() {
       },
       onError: () => toast({ variant: "destructive", title: "Failed to update application" }),
     });
+  };
+
+  const openCheckOut = (rec: CheckOutState) => {
+    setCheckOutDialog(rec);
+    setCheckOutTime(new Date().toISOString().slice(0, 16));
+    setHoursLogged("");
+  };
+
+  const handleCheckOut = () => {
+    if (!checkOutDialog) return;
+    updateAttendanceMutation.mutate(
+      { attendanceId: checkOutDialog.attendanceId, data: { checkOut: new Date(checkOutTime).toISOString(), hoursLogged: hoursLogged ? Number(hoursLogged) : undefined } },
+      {
+        onSuccess: () => {
+          qc.invalidateQueries({ queryKey: getGetEventAttendanceQueryKey(eventId) });
+          toast({ title: `${checkOutDialog.volunteerName} checked out` });
+          setCheckOutDialog(null);
+        },
+        onError: () => toast({ variant: "destructive", title: "Check-out failed" }),
+      }
+    );
   };
 
   const handleGenerateCerts = () => {
@@ -238,15 +276,37 @@ export default function EventDetail() {
                       {attendance?.map((rec) => (
                         <div key={rec.id} className="flex items-center justify-between py-2 border-b last:border-0" data-testid={`row-attendance-${rec.id}`}>
                           <div>
-                            <div className="text-sm font-medium">{rec.volunteerName}</div>
+                            <div className="text-sm font-medium">{rec.volunteerName ?? "Volunteer"}</div>
                             <div className="text-xs text-muted-foreground">
-                              Checked in: {new Date(rec.checkIn).toLocaleTimeString()}
-                              {rec.checkOut && ` · Out: ${new Date(rec.checkOut).toLocaleTimeString()}`}
+                              <span className="flex items-center gap-1">
+                                <LogIn className="h-3 w-3" />
+                                {new Date(rec.checkIn).toLocaleString()}
+                              </span>
+                              {rec.checkOut && (
+                                <span className="flex items-center gap-1 mt-0.5">
+                                  <LogOut className="h-3 w-3" />
+                                  {new Date(rec.checkOut).toLocaleString()}
+                                </span>
+                              )}
                             </div>
                           </div>
-                          {rec.hoursLogged !== null && rec.hoursLogged !== undefined && (
-                            <span className="text-sm font-medium">{rec.hoursLogged}h</span>
-                          )}
+                          <div className="flex items-center gap-3">
+                            {rec.hoursLogged !== null && rec.hoursLogged !== undefined && (
+                              <span className="text-sm font-medium">{rec.hoursLogged}h</span>
+                            )}
+                            {!rec.checkOut && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 text-xs gap-1"
+                                onClick={() => openCheckOut({ attendanceId: rec.id, volunteerName: rec.volunteerName ?? "Volunteer", checkIn: rec.checkIn })}
+                                data-testid={`btn-checkout-detail-${rec.id}`}
+                              >
+                                <LogOut className="h-3 w-3" />
+                                Check Out
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       ))}
                       {(!attendance || attendance.length === 0) && (
@@ -282,6 +342,49 @@ export default function EventDetail() {
               </CardContent>
             </Card>
           )}
+
+          <Dialog open={!!checkOutDialog} onOpenChange={(open) => !open && setCheckOutDialog(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Check Out — {checkOutDialog?.volunteerName}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="det-checkout-time">Check-out Date & Time</Label>
+                  <Input
+                    id="det-checkout-time"
+                    type="datetime-local"
+                    value={checkOutTime}
+                    onChange={(e) => setCheckOutTime(e.target.value)}
+                    data-testid="input-detail-checkout-time"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="det-hours">Hours Logged (optional)</Label>
+                  <Input
+                    id="det-hours"
+                    type="number"
+                    min={0}
+                    step={0.5}
+                    placeholder="e.g. 3.5"
+                    value={hoursLogged}
+                    onChange={(e) => setHoursLogged(e.target.value)}
+                    data-testid="input-detail-hours"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setCheckOutDialog(null)}>Cancel</Button>
+                <Button
+                  onClick={handleCheckOut}
+                  disabled={!checkOutTime || updateAttendanceMutation.isPending}
+                  data-testid="btn-confirm-checkout-detail"
+                >
+                  {updateAttendanceMutation.isPending ? "Saving..." : "Confirm Check-out"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {isStaff && event.status === "COMPLETED" && (
             <Card>

@@ -13,10 +13,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
+import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import api from "@/lib/api";
 
 async function downloadReportCsv(endpoint: string, filename: string) {
@@ -34,17 +36,20 @@ async function downloadReportCsv(endpoint: string, filename: string) {
 const COLORS = ["#EE7F31", "#3F746A", "#E8C547", "#6366F1", "#EC4899", "#14B8A6"];
 
 function ParticipationReport() {
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
+
   const { data, isLoading } = useGetVolunteerParticipationReport(
-    { size: 100 },
-    { query: { queryKey: getGetVolunteerParticipationReportQueryKey({ size: 100 }) } }
+    { page, size: pageSize },
+    { query: { queryKey: getGetVolunteerParticipationReportQueryKey({ page, size: pageSize }) } }
   );
 
   const chartData =
-    data?.content?.slice(0, 10).map((v) => ({
+    (data?.content ?? []).slice(0, 10).map((v) => ({
       name: `${v.firstName} ${v.lastName[0]}.`,
       hours: v.totalHoursLogged,
       events: v.eventsAttended,
-    })) ?? [];
+    }));
 
   const handleExport = () => downloadReportCsv("volunteers", "volunteer-participation-report");
 
@@ -105,6 +110,33 @@ function ParticipationReport() {
               </tbody>
             </table>
           </div>
+          {(data?.totalPages ?? 0) > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t">
+              <p className="text-xs text-muted-foreground">
+                Page {page + 1} of {data?.totalPages} &nbsp;·&nbsp; {data?.totalElements} total
+              </p>
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  data-testid="btn-participation-prev"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page + 1 >= (data?.totalPages ?? 0)}
+                  data-testid="btn-participation-next"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { getRoleDashboardPath } from "@/App";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -21,6 +23,7 @@ const formSchema = z.object({
 export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const registerMutation = useRegister();
 
@@ -41,12 +44,10 @@ export default function Register() {
     registerMutation.mutate(
       { data: values },
       {
-        onSuccess: () => {
-          toast({
-            title: "Registration successful!",
-            description: "Please log in with your new credentials.",
-          });
-          setLocation("/login");
+        onSuccess: (data) => {
+          login(data);
+          toast({ title: "Welcome to NayePankh!", description: "Your account has been created." });
+          setLocation(getRoleDashboardPath(data.role));
         },
         onError: (error: any) => {
           toast({
