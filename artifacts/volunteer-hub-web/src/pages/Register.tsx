@@ -82,11 +82,8 @@ export default function Register() {
         <div className="auth-right-inner" style={{ maxWidth: "30rem" }}>
           {/* Mobile branded header */}
           <div className="auth-mobile-logo">
-            <img src="/nayepankh-logo.png" alt="NayePankh" />
-            <div className="auth-mobile-logo-text">
-              <strong>NayePankh Foundation</strong>
-              <span>Volunteer Hub Platform</span>
-            </div>
+            <img src="/nayepankh-logo.png" alt="NayePankh" style={{ height: "2rem", width: "auto" }} />
+            <span style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground)", fontWeight: 500 }}>Volunteer Hub</span>
           </div>
 
           {/* Heading */}

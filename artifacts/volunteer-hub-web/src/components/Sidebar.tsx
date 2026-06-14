@@ -54,16 +54,11 @@ export function Sidebar() {
   return (
     <aside className="w-64 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col h-screen sticky top-0">
       <div className="p-6">
-        <div className="flex items-center gap-2 font-bold text-xl text-sidebar-primary">
-          <span className="bg-sidebar-primary text-sidebar-primary-foreground p-1 rounded">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-              <path d="M12 12v9" />
-              <path d="m8 17 4 4 4-4" />
-            </svg>
-          </span>
-          NayePankh
-        </div>
+        <img
+          src="/nayepankh-logo.png"
+          alt="NayePankh"
+          style={{ height: "2rem", width: "auto", objectFit: "contain" }}
+        />
         <div className="mt-1 text-xs text-muted-foreground capitalize">{user.role.toLowerCase()} portal</div>
       </div>
 
