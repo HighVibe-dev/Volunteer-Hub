@@ -85,7 +85,11 @@ router.get("/storage/public-objects/*filePath", async (req: Request, res: Respon
  * These are served from a separate path from /public-objects and can optionally
  * be protected with authentication or ACL checks based on the use case.
  */
-router.get("/storage/objects/*path", requireBearerAuth, async (req: Request, res: Response) => {
+// Objects are stored under UUID-based paths (capability tokens).
+// The GET route is intentionally unauthenticated: browser <img> tags cannot
+// attach Bearer headers, and UUID paths are effectively unguessable.
+// Upload (POST) remains auth-protected to prevent quota abuse.
+router.get("/storage/objects/*path", async (req: Request, res: Response) => {
   try {
     const raw = req.params.path;
     const wildcardPath = Array.isArray(raw) ? raw.join("/") : raw;

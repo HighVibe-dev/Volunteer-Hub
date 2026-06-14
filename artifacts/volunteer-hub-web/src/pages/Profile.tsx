@@ -131,7 +131,10 @@ export default function Profile() {
     try {
       const metaRes = await fetch("/api/storage/uploads/request-url", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("accessToken") ?? ""}`,
+        },
         body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
       });
       if (!metaRes.ok) throw new Error("Could not get upload URL");
