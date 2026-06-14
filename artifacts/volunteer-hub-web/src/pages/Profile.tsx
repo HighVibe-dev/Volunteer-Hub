@@ -94,7 +94,7 @@ export default function Profile() {
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     values: {
-      name: p?.name ?? p?.firstName ? `${p?.firstName ?? ""} ${p?.lastName ?? ""}`.trim() : "",
+      name: p?.name ?? `${p?.firstName ?? ""} ${p?.lastName ?? ""}`.trim(),
       phone: p?.phone ?? "",
       city: p?.city ?? "",
       college: p?.college ?? "",
