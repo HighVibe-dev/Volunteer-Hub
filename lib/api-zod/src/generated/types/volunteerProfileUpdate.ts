@@ -9,7 +9,13 @@
 export interface VolunteerProfileUpdate {
   firstName?: string;
   lastName?: string;
+  name?: string;
   phone?: string;
   address?: string;
   bio?: string;
+  college?: string;
+  city?: string;
+  age?: number;
+  profileImage?: string;
+  availability?: string;
 }

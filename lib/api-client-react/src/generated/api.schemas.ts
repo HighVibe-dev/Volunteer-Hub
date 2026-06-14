@@ -63,22 +63,17 @@ export interface AuthResponse {
   expiresIn?: number;
 }
 
-export type VolunteerProfileStatus = typeof VolunteerProfileStatus[keyof typeof VolunteerProfileStatus];
+/**
+ * @nullable
+ */
+export type VolunteerProfileBadgeLevel = typeof VolunteerProfileBadgeLevel[keyof typeof VolunteerProfileBadgeLevel] | null;
 
 
-export const VolunteerProfileStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  PENDING: 'PENDING',
-} as const;
-
-export type VolunteerProfileRole = typeof VolunteerProfileRole[keyof typeof VolunteerProfileRole];
-
-
-export const VolunteerProfileRole = {
-  ADMIN: 'ADMIN',
-  COORDINATOR: 'COORDINATOR',
-  VOLUNTEER: 'VOLUNTEER',
+export const VolunteerProfileBadgeLevel = {
+  NONE: 'NONE',
+  BRONZE: 'BRONZE',
+  SILVER: 'SILVER',
+  GOLD: 'GOLD',
 } as const;
 
 export interface Skill {
@@ -92,8 +87,12 @@ export interface Skill {
 
 export interface VolunteerProfile {
   id: number;
-  firstName: string;
-  lastName: string;
+  /** @nullable */
+  firstName?: string | null;
+  /** @nullable */
+  lastName?: string | null;
+  /** @nullable */
+  name?: string | null;
   email: string;
   /** @nullable */
   phone?: string | null;
@@ -101,12 +100,37 @@ export interface VolunteerProfile {
   address?: string | null;
   /** @nullable */
   bio?: string | null;
-  status: VolunteerProfileStatus;
-  role: VolunteerProfileRole;
-  totalHoursLogged?: number;
-  eventsAttended?: number;
+  /** @nullable */
+  college?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  age?: number | null;
+  /** @nullable */
+  profileImage?: string | null;
+  /** @nullable */
+  availability?: string | null;
+  /** @nullable */
+  status?: string | null;
+  /** @nullable */
+  role?: string | null;
+  active?: boolean;
+  /** @nullable */
+  badgeLevel?: VolunteerProfileBadgeLevel;
+  totalHours?: number;
+  /** @nullable */
+  totalHoursLogged?: number | null;
+  /** @nullable */
+  eventsAttended?: number | null;
+  /** @nullable */
+  eventsParticipated?: number | null;
+  /** @nullable */
+  certificatesEarned?: number | null;
   skills?: Skill[];
-  joinedAt?: string;
+  /** @nullable */
+  joinedAt?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
   /** @nullable */
   avatarUrl?: string | null;
 }
@@ -114,9 +138,15 @@ export interface VolunteerProfile {
 export interface VolunteerProfileUpdate {
   firstName?: string;
   lastName?: string;
+  name?: string;
   phone?: string;
   address?: string;
   bio?: string;
+  college?: string;
+  city?: string;
+  age?: number;
+  profileImage?: string;
+  availability?: string;
 }
 
 export interface VolunteerSkillInput {
@@ -453,6 +483,21 @@ export interface SearchResults {
   volunteers?: VolunteerProfile[];
   events?: Event[];
   totalResults?: number;
+}
+
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
 }
 
 export type ListVolunteersParams = {

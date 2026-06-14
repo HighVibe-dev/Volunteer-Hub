@@ -89,6 +89,14 @@ public class CertificateService {
     }
 
     /**
+     * List all certificates — for admin/coordinator use.
+     */
+    public List<CertificateResponse> getAllCertificates() {
+        return certificateRepository.findAll().stream()
+                .map(this::toResponse).collect(Collectors.toList());
+    }
+
+    /**
      * List certificates for a given volunteer — caller must be that volunteer or an admin/coordinator.
      */
     public List<CertificateResponse> getVolunteerCertificates(Long volunteerId) {

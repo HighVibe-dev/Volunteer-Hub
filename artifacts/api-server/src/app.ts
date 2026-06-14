@@ -30,7 +30,8 @@ app.use(
 );
 app.use(cors());
 
-app.use("/api/healthz", router);
+app.use(express.json());
+app.use("/api", router);
 
 app.use("/api", (req: Request, res: Response) => {
   const options = {
@@ -57,7 +58,18 @@ app.use("/api", (req: Request, res: Response) => {
     res.end(JSON.stringify({ success: false, message: "API server unavailable" }));
   });
 
-  req.pipe(proxyReq, { end: true });
+  // express.json() consumes the stream body before this catch-all runs.
+  // For requests with a parsed body (POST/PUT/PATCH), write it directly
+  // instead of piping the already-exhausted stream.
+  if (req.body !== undefined && typeof req.body === "object") {
+    const bodyData = JSON.stringify(req.body);
+    proxyReq.setHeader("Content-Length", Buffer.byteLength(bodyData));
+    proxyReq.setHeader("Content-Type", "application/json");
+    proxyReq.write(bodyData);
+    proxyReq.end();
+  } else {
+    req.pipe(proxyReq, { end: true });
+  }
 });
 
 export default app;

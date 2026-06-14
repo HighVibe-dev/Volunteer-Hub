@@ -60,8 +60,8 @@ export default function VolunteerDetail() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{volunteer.firstName} {volunteer.lastName}</h1>
-          <p className="text-muted-foreground capitalize">{volunteer.role.toLowerCase()}</p>
+          <h1 className="text-3xl font-bold tracking-tight">{volunteer.firstName ?? ""} {volunteer.lastName ?? ""}</h1>
+          <p className="text-muted-foreground capitalize">{(volunteer.role ?? "volunteer").toLowerCase()}</p>
         </div>
       </div>
 
@@ -70,10 +70,10 @@ export default function VolunteerDetail() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-3xl">
-                {volunteer.firstName[0]}{volunteer.lastName[0]}
+                {(volunteer.firstName ?? volunteer.name ?? "?")[0]}{(volunteer.lastName ?? "")[0]}
               </div>
               <div>
-                <h2 className="text-xl font-semibold">{volunteer.firstName} {volunteer.lastName}</h2>
+                <h2 className="text-xl font-semibold">{volunteer.firstName ?? ""} {volunteer.lastName ?? ""}</h2>
                 <span className={`text-xs font-medium px-2 py-1 rounded-full mt-1 inline-block ${statusColor}`}>
                   {volunteer.status}
                 </span>

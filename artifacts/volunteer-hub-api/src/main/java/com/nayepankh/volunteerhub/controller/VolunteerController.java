@@ -49,6 +49,16 @@ public class VolunteerController {
                         PageRequest.of(page, size, Sort.by("createdAt").descending()))));
     }
 
+    @GetMapping("/me")
+    @Operation(summary = "Get own volunteer profile (current authenticated volunteer)")
+    public ResponseEntity<ApiResponse<VolunteerResponse>> getMe(HttpServletRequest req) {
+        Long callerId = callerUserId(req);
+        if (callerId == null) {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return ResponseEntity.ok(ApiResponse.success(volunteerService.getVolunteerById(callerId)));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get volunteer by ID (self or admin/coordinator)")
     public ResponseEntity<ApiResponse<VolunteerResponse>> getById(

@@ -6,13 +6,16 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { Skill } from './skill';
-import type { VolunteerProfileRole } from './volunteerProfileRole';
-import type { VolunteerProfileStatus } from './volunteerProfileStatus';
+import type { VolunteerProfileBadgeLevel } from './volunteerProfileBadgeLevel';
 
 export interface VolunteerProfile {
   id: number;
-  firstName: string;
-  lastName: string;
+  /** @nullable */
+  firstName?: string | null;
+  /** @nullable */
+  lastName?: string | null;
+  /** @nullable */
+  name?: string | null;
   email: string;
   /** @nullable */
   phone?: string | null;
@@ -20,12 +23,37 @@ export interface VolunteerProfile {
   address?: string | null;
   /** @nullable */
   bio?: string | null;
-  status: VolunteerProfileStatus;
-  role: VolunteerProfileRole;
-  totalHoursLogged?: number;
-  eventsAttended?: number;
+  /** @nullable */
+  college?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  age?: number | null;
+  /** @nullable */
+  profileImage?: string | null;
+  /** @nullable */
+  availability?: string | null;
+  /** @nullable */
+  status?: string | null;
+  /** @nullable */
+  role?: string | null;
+  active?: boolean;
+  /** @nullable */
+  badgeLevel?: VolunteerProfileBadgeLevel;
+  totalHours?: number;
+  /** @nullable */
+  totalHoursLogged?: number | null;
+  /** @nullable */
+  eventsAttended?: number | null;
+  /** @nullable */
+  eventsParticipated?: number | null;
+  /** @nullable */
+  certificatesEarned?: number | null;
   skills?: Skill[];
-  joinedAt?: Date;
+  /** @nullable */
+  joinedAt?: Date | null;
+  /** @nullable */
+  createdAt?: Date | null;
   /** @nullable */
   avatarUrl?: string | null;
 }

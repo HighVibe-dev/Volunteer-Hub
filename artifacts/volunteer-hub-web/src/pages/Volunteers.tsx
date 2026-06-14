@@ -193,10 +193,10 @@ export default function Volunteers() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
-                          {vol.firstName[0]}{vol.lastName[0]}
+                          {(vol.firstName ?? vol.name ?? "?")[0]}{(vol.lastName ?? "")[0]}
                         </div>
                         <div>
-                          <div className="font-medium">{vol.firstName} {vol.lastName}</div>
+                          <div className="font-medium">{vol.firstName ?? ""} {vol.lastName ?? ""}</div>
                           <div className="text-xs text-muted-foreground">{vol.email}</div>
                         </div>
                       </div>
@@ -215,7 +215,7 @@ export default function Volunteers() {
                       {vol.totalHoursLogged ?? 0}h
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[vol.status] ?? ""}`}>
+                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[vol.status ?? ""] ?? ""}`}>
                         {vol.status}
                       </span>
                     </td>

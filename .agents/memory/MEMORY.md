@@ -1,1 +1,4 @@
 - [Axios + proxy architecture](axios-baseurl-double-path.md) — no baseURL on axios instance; api-server (8099) proxies to Spring Boot (8080); all /api/* browser traffic goes via api-server.
+- [Express proxy POST body bug](express-proxy-post-body.md) — express.json() consumes the stream; proxy must write req.body directly for POST/PUT/PATCH
+- [Spring Boot missing endpoints](spring-boot-missing-endpoints.md) — /api/volunteers/me and GET /api/certificates were missing; added in VolunteerController + CertificateController
+- [JWT ephemeral secret](jwt-ephemeral-secret.md) — Spring Boot restarts invalidate all sessions; JWT_SECRET env var not set (proposed Task #15 to fix)

@@ -28,6 +28,24 @@ public class CertificateController {
     private final CertificateService certificateService;
     private final JwtUtil jwtUtil;
 
+    @GetMapping
+    @Operation(summary = "List certificates (own for volunteer, all for admin/coordinator)")
+    public ResponseEntity<ApiResponse<List<CertificateResponse>>> list(HttpServletRequest req) {
+        Long callerId = extractUserId(req);
+        if (callerId == null) {
+            throw new UnauthorizedException("Authentication required");
+        }
+        String callerRole = extractRole(req);
+        boolean isStaff = Role.ROLE_ADMIN.name().equals(callerRole)
+                || Role.ROLE_COORDINATOR.name().equals(callerRole);
+        if (isStaff) {
+            return ResponseEntity.ok(ApiResponse.success(
+                    certificateService.getAllCertificates()));
+        }
+        return ResponseEntity.ok(ApiResponse.success(
+                certificateService.getVolunteerCertificates(callerId)));
+    }
+
     @PostMapping("/generate/{eventId}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Generate certificates for event (approved + attended volunteers only)")

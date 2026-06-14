@@ -34,6 +34,8 @@ tags:
     description: Reports
   - name: search
     description: Search
+  - name: storage
+    description: Object storage upload endpoints
 
 paths:
   /healthz:
@@ -964,6 +966,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/SearchResults"
 
+  /storage/uploads/request-url:
+    post:
+      tags: [storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadUrlRequest'
+      responses:
+        '200':
+          description: Presigned upload URL generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadUrlResponse'
+        '400':
+          description: Invalid request
+
 components:
   schemas:
     # ── HEALTH ──────────────────────────────────────────────────────────────────
@@ -1051,14 +1074,16 @@ components:
     # ── VOLUNTEERS ──────────────────────────────────────────────────────────────
     VolunteerProfile:
       type: object
-      required: [id, firstName, lastName, email, status, role]
+      required: [id, email]
       properties:
         id:
           type: integer
         firstName:
-          type: string
+          type: ["string", "null"]
         lastName:
-          type: string
+          type: ["string", "null"]
+        name:
+          type: ["string", "null"]
         email:
           type: string
         phone:
@@ -1067,22 +1092,44 @@ components:
           type: ["string", "null"]
         bio:
           type: ["string", "null"]
+        college:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        age:
+          type: ["integer", "null"]
+        profileImage:
+          type: ["string", "null"]
+        availability:
+          type: ["string", "null"]
         status:
-          type: string
-          enum: [ACTIVE, INACTIVE, PENDING]
+          type: ["string", "null"]
         role:
-          type: string
-          enum: [ADMIN, COORDINATOR, VOLUNTEER]
-        totalHoursLogged:
+          type: ["string", "null"]
+        active:
+          type: boolean
+        badgeLevel:
+          type: ["string", "null"]
+          enum: [NONE, BRONZE, SILVER, GOLD, null]
+        totalHours:
           type: number
+        totalHoursLogged:
+          type: ["number", "null"]
         eventsAttended:
-          type: integer
+          type: ["integer", "null"]
+        eventsParticipated:
+          type: ["integer", "null"]
+        certificatesEarned:
+          type: ["integer", "null"]
         skills:
           type: array
           items:
             $ref: "#/components/schemas/Skill"
         joinedAt:
-          type: string
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: ["string", "null"]
           format: date-time
         avatarUrl:
           type: ["string", "null"]
@@ -1094,11 +1141,23 @@ components:
           type: string
         lastName:
           type: string
+        name:
+          type: string
         phone:
           type: string
         address:
           type: string
         bio:
+          type: string
+        college:
+          type: string
+        city:
+          type: string
+        age:
+          type: integer
+        profileImage:
+          type: string
+        availability:
           type: string
 
     VolunteerSkillInput:
@@ -1680,3 +1739,29 @@ components:
             $ref: "#/components/schemas/Event"
         totalResults:
           type: integer
+
+    # ── STORAGE ───────────────────────────────────────────────────────────────────
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        size:
+          type: integer
+          minimum: 1
+        contentType:
+          type: string
+          minLength: 1
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL:
+          type: string
+          format: uri
+        objectPath:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/UploadUrlRequest'

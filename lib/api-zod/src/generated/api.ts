@@ -99,23 +99,35 @@ export const ListVolunteersQueryParams = zod.object({
 export const ListVolunteersResponse = zod.object({
   "content": zod.array(zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })),
   "totalElements": zod.number(),
@@ -132,23 +144,35 @@ export const ListVolunteersResponse = zod.object({
  */
 export const GetMyProfileResponse = zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })
 
@@ -159,30 +183,48 @@ export const GetMyProfileResponse = zod.object({
 export const UpdateMyProfileBody = zod.object({
   "firstName": zod.string().optional(),
   "lastName": zod.string().optional(),
+  "name": zod.string().optional(),
   "phone": zod.string().optional(),
   "address": zod.string().optional(),
-  "bio": zod.string().optional()
+  "bio": zod.string().optional(),
+  "college": zod.string().optional(),
+  "city": zod.string().optional(),
+  "age": zod.number().optional(),
+  "profileImage": zod.string().optional(),
+  "availability": zod.string().optional()
 })
 
 export const UpdateMyProfileResponse = zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })
 
@@ -196,23 +238,35 @@ export const GetVolunteerByIdParams = zod.object({
 
 export const GetVolunteerByIdResponse = zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })
 
@@ -226,23 +280,35 @@ export const ActivateVolunteerParams = zod.object({
 
 export const ActivateVolunteerResponse = zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })
 
@@ -256,23 +322,35 @@ export const DeactivateVolunteerParams = zod.object({
 
 export const DeactivateVolunteerResponse = zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })
 
@@ -290,23 +368,35 @@ export const AddVolunteerSkillBody = zod.object({
 
 export const AddVolunteerSkillResponse = zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })
 
@@ -321,23 +411,35 @@ export const RemoveVolunteerSkillParams = zod.object({
 
 export const RemoveVolunteerSkillResponse = zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })
 
@@ -1013,23 +1115,35 @@ export const GlobalSearchQueryParams = zod.object({
 export const GlobalSearchResponse = zod.object({
   "volunteers": zod.array(zod.object({
   "id": zod.number(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
+  "firstName": zod.string().nullish(),
+  "lastName": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "email": zod.string(),
   "phone": zod.string().nullish(),
   "address": zod.string().nullish(),
   "bio": zod.string().nullish(),
-  "status": zod.enum(['ACTIVE', 'INACTIVE', 'PENDING']),
-  "role": zod.enum(['ADMIN', 'COORDINATOR', 'VOLUNTEER']),
-  "totalHoursLogged": zod.number().optional(),
-  "eventsAttended": zod.number().optional(),
+  "college": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "age": zod.number().nullish(),
+  "profileImage": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "active": zod.boolean().optional(),
+  "badgeLevel": zod.union([zod.literal('NONE'),zod.literal('BRONZE'),zod.literal('SILVER'),zod.literal('GOLD'),zod.literal(null)]).nullish(),
+  "totalHours": zod.number().optional(),
+  "totalHoursLogged": zod.number().nullish(),
+  "eventsAttended": zod.number().nullish(),
+  "eventsParticipated": zod.number().nullish(),
+  "certificatesEarned": zod.number().nullish(),
   "skills": zod.array(zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "category": zod.string().nullish(),
   "description": zod.string().nullish()
 })).optional(),
-  "joinedAt": zod.coerce.date().optional(),
+  "joinedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
   "avatarUrl": zod.string().nullish()
 })).optional(),
   "events": zod.array(zod.object({
@@ -1054,6 +1168,36 @@ export const GlobalSearchResponse = zod.object({
   "isApplied": zod.boolean().optional()
 })).optional(),
   "totalResults": zod.number().optional()
+})
+
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+
+
+
+
+
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+})
+
+
+
+
+
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string().url(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+}).optional()
 })
 
 

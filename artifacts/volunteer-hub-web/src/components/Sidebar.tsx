@@ -6,6 +6,10 @@ import {
   Award, Trophy, BarChart3, Wrench, UserPlus, LogOut, User, ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  useGetMyProfile,
+  getGetMyProfileQueryKey,
+} from "@workspace/api-client-react";
 
 const ADMIN_LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -38,9 +42,26 @@ const VOLUNTEER_LINKS = [
   { href: "/profile", label: "My Profile", icon: User },
 ];
 
+function getLevelLabel(hours: number) {
+  if (hours >= 100) return { emoji: "🏆", name: "Community Champion" };
+  if (hours >= 50)  return { emoji: "🌳", name: "Impact Leader" };
+  if (hours >= 10)  return { emoji: "🌿", name: "Community Helper" };
+  return                    { emoji: "🌱", name: "Beginner Volunteer" };
+}
+
 export function Sidebar() {
   const { user, logout } = useAuth();
-  const [location] = useLocation();
+  const [location]       = useLocation();
+
+  const isVolunteer = user?.role === "VOLUNTEER";
+
+  const { data: profile } = useGetMyProfile({
+    query: {
+      enabled: isVolunteer,
+      queryKey: getGetMyProfileQueryKey(),
+      staleTime: 60_000,
+    },
+  });
 
   if (!user) return null;
 
@@ -51,9 +72,11 @@ export function Sidebar() {
   const isActive = (href: string) =>
     location === href || location.startsWith(`${href}/`);
 
+  const level = getLevelLabel(profile?.totalHours ?? 0);
+
   return (
     <aside className="w-64 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col h-screen sticky top-0">
-      <div className="p-6">
+      <div className="px-6 pt-5 pb-4">
         <img
           src="/nayepankh-logo.png"
           alt="NayePankh"
@@ -62,38 +85,56 @@ export function Sidebar() {
         <div className="mt-1 text-xs text-muted-foreground capitalize">{user.role.toLowerCase()} portal</div>
       </div>
 
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
         {links.map((link) => {
-          const Icon = link.icon;
+          const Icon   = link.icon;
           const active = isActive(link.href);
           return (
             <Link key={link.href} href={link.href}>
-              <a
+              <div
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer relative",
                   active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    ? "text-primary bg-primary/10"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
                 data-testid={`nav-${link.label.toLowerCase().replace(/\s+/g, "-")}`}
               >
-                <Icon className="w-4 h-4" />
+                {active && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
+                )}
+                <div className={cn(
+                  "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+                  active ? "bg-primary/15" : "bg-transparent"
+                )}>
+                  <Icon className={cn("w-4 h-4", active ? "text-primary" : "")} />
+                </div>
                 {link.label}
-              </a>
+              </div>
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-sidebar-border">
+      <div className="p-3 border-t border-sidebar-border">
         <Link href="/profile">
-          <div className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md hover:bg-sidebar-accent cursor-pointer transition-colors">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
-              {user.firstName[0]}
+          <div className="flex items-center gap-3 px-3 py-2.5 mb-1 rounded-lg hover:bg-sidebar-accent cursor-pointer transition-colors">
+            <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+              {(user.firstName ?? "V")[0]}
             </div>
-            <div className="flex flex-col overflow-hidden">
-              <span className="text-sm font-medium truncate">{user.firstName} {user.lastName}</span>
-              <span className="text-xs text-muted-foreground truncate capitalize">{user.role.toLowerCase()}</span>
+            <div className="flex flex-col overflow-hidden flex-1 min-w-0">
+              <span className="text-sm font-medium truncate">
+                {user.firstName ?? ""} {user.lastName ?? ""}
+              </span>
+              {isVolunteer ? (
+                <span className="text-[10px] font-medium text-primary/80 truncate">
+                  {level.emoji} {level.name}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground truncate capitalize">
+                  {user.role.toLowerCase()}
+                </span>
+              )}
             </div>
           </div>
         </Link>
