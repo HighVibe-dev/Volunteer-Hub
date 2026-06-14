@@ -1,1 +1,1 @@
-- [Axios baseURL double-path](axios-baseurl-double-path.md) — generated client URLs already include /api; axios instance must NOT have baseURL set or paths double up.
+- [Axios + proxy architecture](axios-baseurl-double-path.md) — no baseURL on axios instance; api-server (8099) proxies to Spring Boot (8080); all /api/* browser traffic goes via api-server.

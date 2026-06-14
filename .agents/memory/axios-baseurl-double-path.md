@@ -1,11 +1,20 @@
 ---
-name: Axios baseURL double-path with generated client
-description: Why the axios instance in api.ts must NOT have baseURL set when used with the generated API client
+name: Axios baseURL double-path with generated client + proxy architecture
+description: Why api.ts must NOT have baseURL, and how the proxy chain works between api-server and Spring Boot
 ---
 
-## The rule
+## Rule 1: No baseURL on the axios instance
 The `api` axios instance in `artifacts/volunteer-hub-web/src/lib/api.ts` must NOT have `baseURL: "/api"`.
 
-**Why:** The generated API client (`lib/api-client-react`) already returns full paths like `/api/auth/register`. When `customFetchViaAxios` passes that full path to `_axiosInstance.request({ url })`, axios calls `buildFullPath(baseURL, url)`. Since `/api/auth/register` is not an absolute URL (no scheme), axios combines them: `/api` + `/api/auth/register` = `/api/api/auth/register` — doubling the prefix. Spring Boot then sees `/api/auth/register` after stripping its own context path, which is a protected endpoint — returns 403. Never a visible error message, just a silent auth-access failure.
+**Why:** The generated API client already returns full paths like `/api/auth/register`. Axios `buildFullPath` combines baseURL + url unless url is an absolute URL (has http/https scheme). Since `/api/auth/register` has no scheme, axios combines: `/api` + `/api/auth/register` = `/api/api/auth/register` — doubling the prefix.
 
-**How to apply:** Keep the axios instance created without `baseURL`. The interceptors (Bearer token, 401 redirect) still work — they only care about request/response metadata, not the URL.
+## Rule 2: Proxy architecture — api-server → Spring Boot
+Replit routes all `/api/*` browser requests to the api-server artifact (port 8099). Spring Boot must NOT run on the same port. The working architecture:
+
+- **api-server** (port 8099): Express proxy middleware in `app.ts` forwards all `/api/*` requests to Spring Boot at port 8080
+- **Spring Boot** (port 8080): configured via `server.port=${SPRING_PORT:8080}` in `application.properties`
+- **NayePankh API workflow**: `waitForPort = 8080`
+
+**Why:** Replit's artifact system assigns PORT=8099 to the api-server artifact (it has `paths=["/api"]` in artifact.toml). Running Spring Boot on the same port causes a startup conflict — whichever process starts second fails. The api-server proxy is the correct gateway.
+
+**How to apply:** If Spring Boot needs to move to a different port, update BOTH `application.properties` (SPRING_PORT default) AND `configureWorkflow({ waitForPort })` AND the `SPRING_BOOT_PORT` constant in `artifacts/api-server/src/app.ts`.
