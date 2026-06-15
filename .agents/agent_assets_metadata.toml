@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "svNmP6bJ7qiDIAKm5N9-n"
@@ -24,3 +23,9 @@ id = "DsiGZI4rMEQ5SMelGUa-b"
 uri = "file://attached_assets/coordinator-banner-generated.png"
 type = "image"
 title = "coordinator dashboard banner"
+
+[[outputs]]
+id = "cR5Q2ireO9JIsv1eFhM3A"
+uri = "file://README.md"
+type = "text"
+title = "NayePankh Volunteer Hub — README"
