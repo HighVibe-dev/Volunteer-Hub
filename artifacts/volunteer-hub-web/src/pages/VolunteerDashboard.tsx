@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import bannerBg from "@assets/image_1781509416149.png";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useGetLeaderboard, getGetLeaderboardQueryKey,
@@ -124,7 +125,7 @@ function HeroBanner({ firstName, hours, quoteIdx }: { firstName: string; hours: 
   return (
     <div
       className="relative w-full rounded-2xl overflow-hidden"
-      style={{ backgroundImage: "url('/opengraph.jpg')", backgroundSize: "cover", backgroundPosition: "center 30%", minHeight: 220 }}
+      style={{ backgroundImage: `url(${bannerBg})`, backgroundSize: "cover", backgroundPosition: "center 30%", minHeight: 220 }}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-black/82 via-black/55 to-black/15" />
       <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end gap-6 p-6 min-h-[220px]">
