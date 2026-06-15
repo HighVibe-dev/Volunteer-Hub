@@ -27,7 +27,7 @@ export default function Leaderboard() {
   });
 
   const chartData = data?.slice(0, 8).map((entry) => ({
-    name: `${entry.firstName} ${entry.lastName[0]}.`,
+    name: `${entry.firstName ?? ""} ${entry.lastName?.[0] ?? ""}.`.trim(),
     hours: entry.totalHoursLogged,
     events: entry.eventsAttended,
   })) ?? [];
@@ -77,7 +77,7 @@ export default function Leaderboard() {
                   {idx < 3 ? <Trophy className="h-4 w-4" /> : entry.rank}
                 </div>
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
-                  {entry.firstName[0]}{entry.lastName[0]}
+                  {entry.firstName?.[0] ?? ""}{entry.lastName?.[0] ?? ""}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold truncate">{entry.firstName} {entry.lastName}</div>
