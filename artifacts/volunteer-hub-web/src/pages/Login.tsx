@@ -92,7 +92,7 @@ export default function Login() {
         <div className="auth-right-inner">
           {/* Mobile branded header */}
           <div className="auth-mobile-logo">
-            <img src="/nayepankh-logo.png" alt="NayePankh" style={{ height: "2rem", width: "auto" }} />
+            <img src="/nayepankh-logo.png" alt="NayePankh" style={{ height: "4rem", width: "auto" }} />
             <span style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground)", fontWeight: 500 }}>Volunteer Hub</span>
           </div>
 

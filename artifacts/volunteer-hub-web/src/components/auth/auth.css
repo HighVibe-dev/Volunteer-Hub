@@ -243,7 +243,7 @@
   background: linear-gradient(135deg, #FF7A18, #FFB347);
 }
 @media (min-width: 1024px) { .auth-mobile-logo { display: none; } }
-.auth-mobile-logo img { width: 44px; height: 44px; object-fit: contain; }
+.auth-mobile-logo img { width: 80px; height: 80px; object-fit: contain; }
 .auth-mobile-logo-text { color: white; }
 .auth-mobile-logo-text strong { display: block; font-weight: 700; font-size: 0.925rem; }
 .auth-mobile-logo-text span { font-size: 0.7rem; opacity: 0.85; }

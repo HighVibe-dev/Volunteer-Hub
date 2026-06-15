@@ -80,7 +80,7 @@ export function Sidebar() {
         <img
           src="/nayepankh-logo.png"
           alt="NayePankh"
-          style={{ height: "2rem", width: "auto", objectFit: "contain" }}
+          style={{ height: "4rem", width: "auto", objectFit: "contain" }}
         />
         <div className="mt-1 text-xs text-muted-foreground capitalize">{user.role.toLowerCase()} portal</div>
       </div>

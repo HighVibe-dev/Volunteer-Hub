@@ -85,7 +85,7 @@ export function AuthHeroPanel() {
       <div className="auth-hero-content">
         {/* Logo */}
         <div className="auth-logo-card auth-fade-up" style={{ animationDelay: "0.1s", background: "rgba(255,255,255,0.95)", borderRadius: "1rem", padding: "0.75rem 1.25rem", display: "inline-flex", alignItems: "center" }}>
-          <img src="/nayepankh-logo.png" alt="NayePankh" style={{ height: "2.25rem", width: "auto", objectFit: "contain" }} />
+          <img src="/nayepankh-logo.png" alt="NayePankh" style={{ height: "6rem", width: "auto", objectFit: "contain" }} />
         </div>
 
         <h1 className="auth-headline auth-fade-up" style={{ animationDelay: "0.25s" }}>
