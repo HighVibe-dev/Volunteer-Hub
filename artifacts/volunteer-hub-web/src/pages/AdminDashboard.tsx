@@ -1,3 +1,4 @@
+import bannerBg from "@assets/admin-banner-generated.png";
 import {
   useGetDashboardStats,
   getGetDashboardStatsQueryKey,
@@ -96,9 +97,15 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Organization overview for NayePankh Foundation</p>
+      <div
+        className="relative w-full rounded-2xl overflow-hidden"
+        style={{ backgroundImage: `url(${bannerBg})`, backgroundSize: "cover", backgroundPosition: "center 30%", minHeight: 200 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-black/82 via-black/55 to-black/15" />
+        <div className="relative z-10 flex flex-col justify-end p-6 min-h-[200px]">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">Admin Dashboard</h1>
+          <p className="text-white/75 text-sm">Organization overview for NayePankh Foundation</p>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

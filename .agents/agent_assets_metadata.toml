@@ -12,3 +12,15 @@ id = "gil1YNEAvEi4MwwsW95zU"
 uri = "file://attached_assets/volunteer-banner-v2.png"
 type = "image"
 title = "volunteer children full body banner"
+
+[[generated]]
+id = "tNF2QPhW0GTm7jVAirsZ9"
+uri = "file://attached_assets/admin-banner-generated.png"
+type = "image"
+title = "admin dashboard banner"
+
+[[generated]]
+id = "DsiGZI4rMEQ5SMelGUa-b"
+uri = "file://attached_assets/coordinator-banner-generated.png"
+type = "image"
+title = "coordinator dashboard banner"

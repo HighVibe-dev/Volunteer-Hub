@@ -1,3 +1,4 @@
+import bannerBg from "@assets/coordinator-banner-generated.png";
 import {
   useGetDashboardStats,
   getGetDashboardStatsQueryKey,
@@ -93,9 +94,15 @@ export default function CoordinatorDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Coordinator Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, {user?.firstName}. Here's your coordination summary.</p>
+      <div
+        className="relative w-full rounded-2xl overflow-hidden"
+        style={{ backgroundImage: `url(${bannerBg})`, backgroundSize: "cover", backgroundPosition: "center 30%", minHeight: 200 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-black/82 via-black/55 to-black/15" />
+        <div className="relative z-10 flex flex-col justify-end p-6 min-h-[200px]">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">Coordinator Dashboard</h1>
+          <p className="text-white/75 text-sm">Welcome back, {user?.firstName}. Here's your coordination summary.</p>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
