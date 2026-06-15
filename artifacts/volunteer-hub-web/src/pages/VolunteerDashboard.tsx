@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import bannerBg from "@assets/volunteer-banner-v2.png";
+import bannerBg from "@assets/image_1781512471173.png";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useGetLeaderboard, getGetLeaderboardQueryKey,
