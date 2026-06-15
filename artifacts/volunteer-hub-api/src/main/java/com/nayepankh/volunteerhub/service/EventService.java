@@ -29,10 +29,12 @@ public class EventService {
     private final VolunteerService volunteerService;
     private final AuditLogService auditLogService;
 
+    @Transactional(readOnly = true)
     public Page<EventResponse> getAllEvents(Pageable pageable) {
         return eventRepository.findAll(pageable).map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public EventResponse getEventById(Long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event", id));

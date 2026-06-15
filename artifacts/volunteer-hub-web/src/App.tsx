@@ -34,6 +34,7 @@ import Reports from "@/pages/Reports";
 import Skills from "@/pages/Skills";
 import StaffNew from "@/pages/StaffNew";
 import AuditLog from "@/pages/AuditLog";
+import SeedAuth from "@/pages/SeedAuth";
 
 import type { AuthResponseRole } from "@workspace/api-client-react";
 
@@ -125,6 +126,7 @@ function VolunteerPortalRoutes() {
 function Router() {
   return (
     <Switch>
+      <Route path="/__seed" component={SeedAuth} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/forgot-password" component={ForgotPassword} />

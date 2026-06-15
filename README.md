@@ -6,7 +6,13 @@ NayePankh Volunteer Hub is a full-stack web platform built to bring order, trans
 
 ---
 
-![NayePankh Login Page](attached_assets/screenshots/login-page.jpg)
+## App Screenshots
+
+### Login & Registration
+
+| Sign In | Create Account |
+|---|---|
+| ![Login Page](attached_assets/screenshots/login-page.jpg) | ![Register Page](attached_assets/screenshots/register-page.jpg) |
 
 ---
 
@@ -33,6 +39,8 @@ A student or community member who wants to contribute their time.
 - Their position on the leaderboard
 - Notifications for approvals, rejections, and updates
 
+![Volunteer Dashboard](attached_assets/screenshots/volunteer-dashboard.jpg)
+
 ---
 
 ### 📋 Coordinator
@@ -52,7 +60,7 @@ A team lead or event manager who handles day-to-day operations on the ground.
 ### 🛡️ Admin
 The organisation head who needs the full picture at all times.
 
-**Real use case:** Ananya is the NayePankh admin. She opens her dashboard on Monday morning and sees: 142 total volunteers, 8 events this month, 94 certificates issued, and a trend chart showing volunteer growth over 6 months. She creates a new event, reviews the leaderboard, generates a CSV report for a grant application, checks the audit log to see who made what changes, and adds a new coordinator to the system.
+**Real use case:** Ananya is the NayePankh admin. She opens her dashboard on Monday morning and sees: 28 active volunteers, 7 events this month, certificates issued, and a trend chart showing volunteer growth. She creates a new event, reviews the leaderboard, generates a CSV report for a grant application, checks the audit log to see who made what changes, and adds a new coordinator to the system.
 
 **What they see:**
 - Full analytics dashboard with area charts, bar charts, and pie charts
@@ -60,6 +68,8 @@ The organisation head who needs the full picture at all times.
 - Application status breakdown
 - Top 5 volunteers on the leaderboard
 - Access to all management tools: Events, Volunteers, Applications, Reports, Audit Log, Skills
+
+![Admin Dashboard](attached_assets/screenshots/admin-dashboard.jpg)
 
 ---
 
@@ -72,6 +82,8 @@ The organisation head who needs the full picture at all times.
 - Volunteers can apply, and admins/coordinators can approve or reject
 - Volunteers can withdraw their applications before an event starts
 - Search and filter by status, with pagination
+
+![Events Page](attached_assets/screenshots/events-page.jpg)
 
 ### ✅ Attendance Tracking
 - Coordinators mark attendance for each event
@@ -113,6 +125,14 @@ Four detailed reports, each with charts and CSV export:
 - View individual volunteer profiles with their full history
 - See hours, events attended, badges, and certificates per volunteer
 - Add new staff members directly from the platform
+
+![Volunteers Page](attached_assets/screenshots/volunteers-page.jpg)
+
+### 📋 Applications Management
+
+All volunteer applications in one place — filter by status, approve or reject with one click.
+
+![Applications](attached_assets/screenshots/applications.jpg)
 
 ### 🛠️ Skills Management
 - Volunteers can list their skills (e.g. Teaching, First Aid, Photography)
