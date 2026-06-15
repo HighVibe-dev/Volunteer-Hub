@@ -797,19 +797,6 @@ export default function VolunteerDashboard() {
         <ImpactStrip stats={publicStats} />
       </motion.div>
 
-      {/* Full-width photo banner */}
-      <motion.div variants={fadeUp}>
-        <div className="w-full rounded-2xl overflow-hidden" style={{ height: 220 }}>
-          <img
-            src={bannerBg}
-            alt=""
-            aria-hidden
-            className="w-full h-full pointer-events-none select-none"
-            style={{ objectFit: "cover", objectPosition: "center 20%" }}
-          />
-        </div>
-      </motion.div>
-
       {/* Journey + Upcoming events */}
       <motion.div variants={fadeUp} className="grid gap-5 lg:grid-cols-5">
         <div className="lg:col-span-3">
