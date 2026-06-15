@@ -87,10 +87,11 @@
   color: #2d4a38;
   font-weight: 500;
 }
-.auth-feature-emoji {
-  font-size: 1rem;
-  width: 1.5rem;
-  text-align: center;
+.auth-feature-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: #1a3a2a;
+  flex-shrink: 0;
 }
 
 /* Stats bar */

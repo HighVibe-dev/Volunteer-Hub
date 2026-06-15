@@ -1,4 +1,5 @@
 import volunteerPhoto from "@assets/image_1781509416149.png";
+import { Handshake, Users, Sprout } from "lucide-react";
 
 const STATS = [
   { value: "500+", label: "Volunteers" },
@@ -8,9 +9,9 @@ const STATS = [
 ];
 
 const FEATURES = [
-  { emoji: "🤝", label: "Meaningful Opportunities" },
-  { emoji: "👥", label: "Stronger Communities" },
-  { emoji: "🌱", label: "Sustainable Impact" },
+  { Icon: Handshake, label: "Meaningful Opportunities" },
+  { Icon: Users,     label: "Stronger Communities" },
+  { Icon: Sprout,    label: "Sustainable Impact" },
 ];
 
 export function AuthHeroPanel() {
@@ -31,10 +32,10 @@ export function AuthHeroPanel() {
           </p>
 
           <ul className="auth-features">
-            {FEATURES.map((f) => (
-              <li key={f.label} className="auth-feature-item">
-                <span className="auth-feature-emoji">{f.emoji}</span>
-                {f.label}
+            {FEATURES.map(({ Icon, label }) => (
+              <li key={label} className="auth-feature-item">
+                <Icon className="auth-feature-icon" aria-hidden="true" />
+                {label}
               </li>
             ))}
           </ul>
