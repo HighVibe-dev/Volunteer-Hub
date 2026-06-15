@@ -98,8 +98,9 @@ export default function Login() {
 
           {/* Heading */}
           <div className="auth-right-heading">
-            <h2>Welcome Back 👋</h2>
-            <p>Continue your volunteering journey and make a difference today.</p>
+            <h2>Welcome Back!</h2>
+            <div className="auth-right-heading-underline" />
+            <p>Sign in to continue your volunteering journey.</p>
           </div>
 
           <div className="auth-card">
@@ -160,7 +161,7 @@ export default function Login() {
                   <FormItem>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       <FormLabel>Password</FormLabel>
-                      <Link href="/forgot-password" style={{ fontSize: "0.75rem", color: "#EE7F31", textDecoration: "none" }}
+                      <Link href="/forgot-password" style={{ fontSize: "0.75rem", color: "#1a3a2a", textDecoration: "none", fontWeight: 500 }}
                         onMouseOver={(e) => (e.currentTarget.style.textDecoration = "underline")}
                         onMouseOut={(e) => (e.currentTarget.style.textDecoration = "none")}
                       >
@@ -219,12 +220,12 @@ export default function Login() {
           </div>
 
           <p className="auth-bottom-link">
-            Don't have an account?{" "}
-            <Link href="/register" style={{ fontWeight: 600, color: "#EE7F31", textDecoration: "none" }}
+            New here?{" "}
+            <Link href="/register" style={{ fontWeight: 600, color: "#1a3a2a", textDecoration: "none" }}
               onMouseOver={(e) => (e.currentTarget.style.textDecoration = "underline")}
               onMouseOut={(e) => (e.currentTarget.style.textDecoration = "none")}
             >
-              Register here
+              Create an account
             </Link>
           </p>
         </div>
