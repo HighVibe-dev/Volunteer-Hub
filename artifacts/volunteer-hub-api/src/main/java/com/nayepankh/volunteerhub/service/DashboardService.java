@@ -35,7 +35,7 @@ public class DashboardService {
         double totalHours = totalHoursRaw != null ? totalHoursRaw : 0.0;
         LocalDateTime startOfMonth = LocalDateTime.now()
                 .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        long eventsThisMonth = eventRepository.countByCreatedAtSince(startOfMonth);
+        long eventsThisMonth = eventRepository.countEventsHostedSince(startOfMonth);
         long certificatesIssued = certificateRepository.count();
         return PublicStatsResponse.builder()
                 .totalVolunteers(totalVolunteers)

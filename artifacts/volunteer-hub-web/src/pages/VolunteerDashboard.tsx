@@ -71,6 +71,13 @@ function fmtNum(n: number): string {
   return String(n);
 }
 
+function getBadgeLevel(hours: number): number {
+  if (hours >= 100) return 4;
+  if (hours >= 50)  return 3;
+  if (hours >= 10)  return 2;
+  return 1;
+}
+
 const fadeUp  = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 const stagger = { show: { transition: { staggerChildren: 0.08 } } };
 
@@ -331,9 +338,9 @@ function challengeClaimKey() {
   return `np-challenge-claimed-${d.getMonth()}-${d.getFullYear()}`;
 }
 
-function MonthlyChallenge({ events }: { events: number }) {
+function MonthlyChallenge({ eventsThisMonth }: { eventsThisMonth: number }) {
   const goal = 2;
-  const progress = Math.min(events, goal);
+  const progress = Math.min(eventsThisMonth, goal);
   const pct = Math.round((progress / goal) * 100);
   const complete = progress >= goal;
 
@@ -363,7 +370,7 @@ function MonthlyChallenge({ events }: { events: number }) {
           <Flame className="h-5 w-5 text-primary" />
           <span className="font-semibold text-sm">Monthly Challenge</span>
         </div>
-        {events === 0 ? (
+        {eventsThisMonth === 0 ? (
           <p className="text-sm text-muted-foreground">Join your first event this month to start your challenge! 🚀</p>
         ) : (
           <>
@@ -419,7 +426,7 @@ function NGOStatLine({ emoji, value, suffix }: { emoji: string; value: number; s
 
 function NGOStoryWidget({ stats, volunteerHours }: { stats: PublicStats | undefined; volunteerHours: number }) {
   const totalHours = stats?.totalVolunteerHours ? Math.round(stats.totalVolunteerHours) : 0;
-  const totalEvents = stats?.totalEvents ?? 0;
+  const eventsThisMonth = stats?.eventsThisMonth ?? 0;
   const certs = stats?.certificatesIssued ?? 0;
   const pct = totalHours > 0 ? Math.round((volunteerHours / totalHours) * 100) : 0;
 
@@ -432,7 +439,7 @@ function NGOStoryWidget({ stats, volunteerHours }: { stats: PublicStats | undefi
         </div>
         <p className="text-sm text-muted-foreground mb-3">Thanks to our volunteers:</p>
         <div className="space-y-2">
-          <NGOStatLine emoji="📅" value={totalEvents}     suffix="events organized" />
+          <NGOStatLine emoji="📅" value={eventsThisMonth} suffix="events hosted this month" />
           <NGOStatLine emoji="⏰" value={totalHours}      suffix="volunteer hours logged" />
           <NGOStatLine emoji="📜" value={certs}           suffix="certificates awarded" />
         </div>
@@ -614,6 +621,20 @@ export default function VolunteerDashboard() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: monthlyStats } = useQuery<{ eventsThisMonth: number }>({
+    queryKey: ["volunteer-monthly-stats"],
+    queryFn: async () => {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch("/api/volunteers/me/monthly-stats", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      return json.data as { eventsThisMonth: number };
+    },
+    enabled: !!user,
+    staleTime: 2 * 60 * 1000,
+  });
+
   const { data: myApplications } = useListApplications(
     { size: 5 },
     { query: { enabled: !!user, queryKey: getListApplicationsQueryKey({ size: 5 }) } }
@@ -706,10 +727,10 @@ export default function VolunteerDashboard() {
 
       {/* Animated stat cards */}
       <motion.div variants={stagger} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Hours Volunteered"  value={hours}     icon={Clock}    bg="bg-orange-500" />
-        <StatCard label="Events Attended"    value={events}    icon={Calendar} bg="bg-teal-500"   />
-        <StatCard label="Certificates"       value={certCount} icon={Award}    bg="bg-violet-500" />
-        <StatCard label="Leaderboard Rank"   value={rankNum}   icon={Trophy}   bg="bg-amber-500"  />
+        <StatCard label="Hours Volunteered"  value={hours}                icon={Clock}    bg="bg-orange-500" />
+        <StatCard label="Events Attended"    value={events}               icon={Calendar} bg="bg-teal-500"   />
+        <StatCard label="Certificates"       value={certCount}            icon={Award}    bg="bg-violet-500" />
+        <StatCard label="Badge Level"        value={getBadgeLevel(hours)} icon={Trophy}   bg="bg-amber-500"  />
       </motion.div>
 
       {/* Share impact strip */}
@@ -835,7 +856,7 @@ export default function VolunteerDashboard() {
 
       {/* Monthly challenge + NGO story */}
       <motion.div variants={fadeUp} className="grid gap-5 md:grid-cols-2">
-        <MonthlyChallenge events={events} />
+        <MonthlyChallenge eventsThisMonth={monthlyStats?.eventsThisMonth ?? 0} />
         <NGOStoryWidget stats={publicStats} volunteerHours={hours} />
       </motion.div>
 

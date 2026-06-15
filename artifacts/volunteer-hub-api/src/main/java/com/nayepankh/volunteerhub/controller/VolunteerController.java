@@ -1,8 +1,10 @@
 package com.nayepankh.volunteerhub.controller;
 
 import com.nayepankh.volunteerhub.dto.volunteer.*;
+import com.nayepankh.volunteerhub.enums.ApplicationStatus;
 import com.nayepankh.volunteerhub.enums.Role;
 import com.nayepankh.volunteerhub.exception.UnauthorizedException;
+import com.nayepankh.volunteerhub.repository.EventApplicationRepository;
 import com.nayepankh.volunteerhub.security.JwtUtil;
 import com.nayepankh.volunteerhub.service.VolunteerService;
 import com.nayepankh.volunteerhub.util.ApiResponse;
@@ -18,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -29,6 +32,7 @@ public class VolunteerController {
 
     private final VolunteerService volunteerService;
     private final JwtUtil jwtUtil;
+    private final EventApplicationRepository eventApplicationRepository;
 
     /**
      * GET /volunteers — admin/coordinator only.
@@ -57,6 +61,22 @@ public class VolunteerController {
             throw new UnauthorizedException("Authentication required");
         }
         return ResponseEntity.ok(ApiResponse.success(volunteerService.getVolunteerById(callerId)));
+    }
+
+    @GetMapping("/me/monthly-stats")
+    @Operation(summary = "Get volunteer's event count for the current month")
+    public ResponseEntity<ApiResponse<MonthlyStatsResponse>> getMyMonthlyStats(HttpServletRequest req) {
+        Long callerId = callerUserId(req);
+        if (callerId == null) {
+            throw new UnauthorizedException("Authentication required");
+        }
+        LocalDateTime startOfMonth = LocalDateTime.now()
+                .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        long count = eventApplicationRepository.countByVolunteerAndStatusAndEventStartDateSince(
+                callerId, ApplicationStatus.APPROVED, startOfMonth);
+        return ResponseEntity.ok(ApiResponse.success(MonthlyStatsResponse.builder()
+                .eventsThisMonth(count)
+                .build()));
     }
 
     @GetMapping("/{id}")

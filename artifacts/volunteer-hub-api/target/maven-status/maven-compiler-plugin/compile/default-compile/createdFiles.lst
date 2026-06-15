@@ -68,6 +68,7 @@ com/nayepankh/volunteerhub/security/JwtUtil.class
 com/nayepankh/volunteerhub/entity/VolunteerProfile$VolunteerProfileBuilder.class
 com/nayepankh/volunteerhub/dto/dashboard/DashboardStatsResponse.class
 com/nayepankh/volunteerhub/entity/VolunteerProfile.class
+com/nayepankh/volunteerhub/dto/volunteer/MonthlyStatsResponse.class
 com/nayepankh/volunteerhub/entity/EventRequirement.class
 com/nayepankh/volunteerhub/controller/SkillController.class
 com/nayepankh/volunteerhub/service/SearchService.class
@@ -90,6 +91,7 @@ com/nayepankh/volunteerhub/entity/Event$EventBuilder.class
 com/nayepankh/volunteerhub/controller/AuditController.class
 com/nayepankh/volunteerhub/dto/volunteer/VolunteerProfileRequest.class
 com/nayepankh/volunteerhub/dto/dashboard/DashboardStatsResponse$MonthlyDataPoint$MonthlyDataPointBuilder.class
+com/nayepankh/volunteerhub/dto/volunteer/MonthlyStatsResponse$MonthlyStatsResponseBuilder.class
 com/nayepankh/volunteerhub/service/SkillService.class
 com/nayepankh/volunteerhub/entity/Skill$SkillBuilder.class
 com/nayepankh/volunteerhub/dto/dashboard/DashboardStatsResponse$TopVolunteer$TopVolunteerBuilder.class

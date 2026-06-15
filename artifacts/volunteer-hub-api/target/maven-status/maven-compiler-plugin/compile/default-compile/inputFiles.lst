@@ -64,6 +64,7 @@
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/entity/Attendance.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/security/JwtAuthFilter.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/VolunteerHubApplication.java
+/home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/dto/volunteer/MonthlyStatsResponse.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/dto/event/EventApplicationResponse.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/entity/EventApplication.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/service/VolunteerService.java

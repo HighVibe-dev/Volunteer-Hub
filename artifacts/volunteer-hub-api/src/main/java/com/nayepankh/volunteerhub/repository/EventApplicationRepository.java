@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,4 +31,11 @@ public interface EventApplicationRepository extends JpaRepository<EventApplicati
             @Param("volunteerId") Long volunteerId,
             @Param("status") ApplicationStatus status,
             Pageable pageable);
+
+    @Query("SELECT COUNT(a) FROM EventApplication a WHERE a.volunteer.id = :volunteerId " +
+           "AND a.status = :status AND a.event.startDate >= :since")
+    long countByVolunteerAndStatusAndEventStartDateSince(
+            @Param("volunteerId") Long volunteerId,
+            @Param("status") ApplicationStatus status,
+            @Param("since") LocalDateTime since);
 }
