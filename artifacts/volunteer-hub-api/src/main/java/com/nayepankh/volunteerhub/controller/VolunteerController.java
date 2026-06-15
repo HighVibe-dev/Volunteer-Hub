@@ -1,10 +1,9 @@
 package com.nayepankh.volunteerhub.controller;
 
 import com.nayepankh.volunteerhub.dto.volunteer.*;
-import com.nayepankh.volunteerhub.enums.ApplicationStatus;
 import com.nayepankh.volunteerhub.enums.Role;
 import com.nayepankh.volunteerhub.exception.UnauthorizedException;
-import com.nayepankh.volunteerhub.repository.EventApplicationRepository;
+import com.nayepankh.volunteerhub.repository.AttendanceRepository;
 import com.nayepankh.volunteerhub.security.JwtUtil;
 import com.nayepankh.volunteerhub.service.VolunteerService;
 import com.nayepankh.volunteerhub.util.ApiResponse;
@@ -32,7 +31,7 @@ public class VolunteerController {
 
     private final VolunteerService volunteerService;
     private final JwtUtil jwtUtil;
-    private final EventApplicationRepository eventApplicationRepository;
+    private final AttendanceRepository attendanceRepository;
 
     /**
      * GET /volunteers — admin/coordinator only.
@@ -72,8 +71,7 @@ public class VolunteerController {
         }
         LocalDateTime startOfMonth = LocalDateTime.now()
                 .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        long count = eventApplicationRepository.countByVolunteerAndStatusAndEventStartDateSince(
-                callerId, ApplicationStatus.APPROVED, startOfMonth);
+        long count = attendanceRepository.countAttendedByVolunteerSince(callerId, startOfMonth);
         return ResponseEntity.ok(ApiResponse.success(MonthlyStatsResponse.builder()
                 .eventsThisMonth(count)
                 .build()));

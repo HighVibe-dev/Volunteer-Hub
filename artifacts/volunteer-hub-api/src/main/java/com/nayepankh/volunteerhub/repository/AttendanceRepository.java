@@ -48,4 +48,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     /** Count all present=true records across all volunteers (for dashboard %). */
     @Query("SELECT COUNT(a) FROM Attendance a WHERE a.present = true")
     long countAllPresent();
+
+    /** Count events a volunteer actually attended (present=true) since the given date. */
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.volunteer.id = :volunteerId AND a.present = true AND a.checkInTime >= :since")
+    long countAttendedByVolunteerSince(@Param("volunteerId") Long volunteerId, @Param("since") LocalDateTime since);
 }

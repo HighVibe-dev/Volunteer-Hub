@@ -71,12 +71,9 @@ function fmtNum(n: number): string {
   return String(n);
 }
 
-function getBadgeLevel(hours: number): number {
-  if (hours >= 100) return 4;
-  if (hours >= 50)  return 3;
-  if (hours >= 10)  return 2;
-  return 1;
-}
+const BADGE_ORDINAL: Record<string, number> = {
+  NONE: 0, BRONZE: 1, SILVER: 2, GOLD: 3, PLATINUM: 4,
+};
 
 const fadeUp  = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 const stagger = { show: { transition: { staggerChildren: 0.08 } } };
@@ -615,29 +612,31 @@ export default function VolunteerDashboard() {
     queryKey: ["public-stats"],
     queryFn: async () => {
       const res = await fetch("/api/stats/public");
+      if (!res.ok) return null as unknown as PublicStats;
       const json = await res.json();
-      return json.data as PublicStats;
+      return (json.data ?? null) as PublicStats;
     },
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: monthlyStats } = useQuery<{ eventsThisMonth: number }>({
+  const { data: monthlyStats } = useQuery<{ eventsThisMonth: number } | null>({
     queryKey: ["volunteer-monthly-stats"],
     queryFn: async () => {
       const token = localStorage.getItem("accessToken");
       const res = await fetch("/api/volunteers/me/monthly-stats", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) return null;
       const json = await res.json();
-      return json.data as { eventsThisMonth: number };
+      return (json.data ?? null) as { eventsThisMonth: number } | null;
     },
     enabled: !!user,
     staleTime: 2 * 60 * 1000,
   });
 
   const { data: myApplications } = useListApplications(
-    { size: 5 },
-    { query: { enabled: !!user, queryKey: getListApplicationsQueryKey({ size: 5 }) } }
+    { size: 200 },
+    { query: { enabled: !!user, queryKey: getListApplicationsQueryKey({ size: 200 }) } }
   );
 
   const { data: certificates } = useListCertificates(
@@ -730,7 +729,7 @@ export default function VolunteerDashboard() {
         <StatCard label="Hours Volunteered"  value={hours}                icon={Clock}    bg="bg-orange-500" />
         <StatCard label="Events Attended"    value={events}               icon={Calendar} bg="bg-teal-500"   />
         <StatCard label="Certificates"       value={certCount}            icon={Award}    bg="bg-violet-500" />
-        <StatCard label="Badge Level"        value={getBadgeLevel(hours)} icon={Trophy}   bg="bg-amber-500"  />
+        <StatCard label="Badge Level"        value={BADGE_ORDINAL[profile?.badgeLevel ?? "NONE"] ?? 0} icon={Trophy}   bg="bg-amber-500"  />
       </motion.div>
 
       {/* Share impact strip */}
