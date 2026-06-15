@@ -94,6 +94,11 @@ export default function Login() {
         <div className="auth-mobile-hero" style={{ backgroundImage: `url(${volunteerPhoto})` }}>
           <div className="auth-mobile-hero-overlay" />
           <img src="/nayepankh-logo.png" alt="NayePankh" className="auth-mobile-hero-logo" />
+          <div className="auth-mobile-hero-quote">
+            <span className="auth-mobile-hero-quote-mark">"</span>
+            Volunteering is the ultimate exercise in democracy.
+            <span className="auth-mobile-hero-quote-author"> — Priya S.</span>
+          </div>
         </div>
 
         <div className="auth-right-inner">

@@ -49,7 +49,7 @@ function getLevelLabel(hours: number) {
   return                    { emoji: "🌱", name: "Beginner Volunteer" };
 }
 
-export function Sidebar() {
+export function Sidebar({ mobile = false }: { mobile?: boolean }) {
   const { user, logout } = useAuth();
   const [location]       = useLocation();
 
@@ -75,7 +75,10 @@ export function Sidebar() {
   const level = getLevelLabel(profile?.totalHours ?? 0);
 
   return (
-    <aside className="w-64 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col h-screen sticky top-0">
+    <aside className={cn(
+      "w-64 bg-sidebar border-r border-sidebar-border flex-col h-screen",
+      mobile ? "flex" : "hidden md:flex sticky top-0"
+    )}>
       <div className="px-6 pt-5 pb-4">
         <img
           src="/nayepankh-logo.png"

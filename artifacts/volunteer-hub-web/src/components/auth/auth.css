@@ -222,6 +222,31 @@
 }
 
 /* Mobile photo hero banner */
+.auth-mobile-hero-quote {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0;
+  right: 0;
+  padding: 0 1rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.92);
+  font-style: italic;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.auth-mobile-hero-quote-mark {
+  font-size: 1.1rem;
+  line-height: 0;
+  vertical-align: -0.15em;
+  margin-right: 0.1em;
+  color: rgba(255,255,255,0.7);
+}
+.auth-mobile-hero-quote-author {
+  font-style: normal;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+}
+
 .auth-mobile-hero {
   position: relative;
   width: 100%;
