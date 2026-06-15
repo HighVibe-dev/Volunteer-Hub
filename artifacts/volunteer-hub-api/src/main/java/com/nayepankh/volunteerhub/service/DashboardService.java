@@ -105,6 +105,12 @@ public class DashboardService {
                         .build())
                 .collect(Collectors.toList());
 
+        long upcomingEvents = eventRepository.countByStatus(EventStatus.UPCOMING);
+        long ongoingEvents = eventRepository.countByStatus(EventStatus.ONGOING);
+        long pendingApplications = applicationRepository.countByStatus(ApplicationStatus.PENDING);
+        long certificatesIssued = certificateRepository.count();
+        long pendingVolunteers = userRepository.countByRole(Role.ROLE_VOLUNTEER) - activeVolunteers;
+
         long totalAttendanceRecords = attendanceRepository.count();
         long totalPresentRecords = attendanceRepository.countAllPresent();
         double attendancePct = totalAttendanceRecords > 0
@@ -113,9 +119,15 @@ public class DashboardService {
         return DashboardStatsResponse.builder()
                 .totalVolunteers(totalVolunteers)
                 .activeVolunteers(activeVolunteers)
+                .pendingVolunteers(Math.max(0, pendingVolunteers))
                 .totalEvents(totalEvents)
+                .upcomingEvents(upcomingEvents)
+                .ongoingEvents(ongoingEvents)
                 .completedEvents(completedEvents)
                 .totalVolunteerHours(totalHours)
+                .totalHoursLogged(totalHours)
+                .certificatesIssued(certificatesIssued)
+                .pendingApplications(pendingApplications)
                 .attendancePercentage(attendancePct)
                 .monthlyVolunteerGrowth(growthData)
                 .monthlyHoursTrend(hoursData)

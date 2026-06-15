@@ -10,9 +10,15 @@ import java.util.List;
 public class DashboardStatsResponse {
     private long totalVolunteers;
     private long activeVolunteers;
+    private long pendingVolunteers;
     private long totalEvents;
+    private long upcomingEvents;
+    private long ongoingEvents;
     private long completedEvents;
     private double totalVolunteerHours;
+    private double totalHoursLogged;
+    private long certificatesIssued;
+    private long pendingApplications;
     private double attendancePercentage;
     private List<MonthlyDataPoint> monthlyVolunteerGrowth;
     private List<MonthlyDataPoint> monthlyHoursTrend;

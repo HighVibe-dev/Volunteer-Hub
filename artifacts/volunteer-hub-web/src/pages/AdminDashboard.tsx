@@ -1,4 +1,4 @@
-import bannerBg from "@assets/admin-banner-generated.png";
+import bannerBg from "@assets/admin-banner.png";
 import {
   useGetDashboardStats,
   getGetDashboardStatsQueryKey,
@@ -110,8 +110,8 @@ export default function AdminDashboard() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Volunteers" value={stats.totalVolunteers} icon={Users} description={`${stats.activeVolunteers} active`} />
-        <StatCard title="Total Hours" value={`${stats.totalHoursLogged}h`} icon={Clock} description="Hours volunteered" variant="success" />
-        <StatCard title="Total Events" value={stats.totalEvents} icon={Calendar} description={`${stats.upcomingEvents} upcoming`} />
+        <StatCard title="Total Hours" value={`${stats.totalHoursLogged ?? 0}h`} icon={Clock} description="Hours volunteered" variant="success" />
+        <StatCard title="Total Events" value={stats.totalEvents} icon={Calendar} description={`${stats.upcomingEvents ?? 0} upcoming`} />
         <StatCard title="Pending Applications" value={stats.pendingApplications} icon={ClipboardList} description="Awaiting review" variant={stats.pendingApplications > 0 ? "warning" : "default"} />
       </div>
 

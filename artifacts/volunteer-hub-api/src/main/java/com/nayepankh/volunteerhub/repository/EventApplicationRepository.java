@@ -21,6 +21,7 @@ public interface EventApplicationRepository extends JpaRepository<EventApplicati
     long countByEventId(Long eventId);
     long countByEventIdAndStatus(Long eventId, ApplicationStatus status);
     long countByVolunteerIdAndStatus(Long volunteerId, ApplicationStatus status);
+    long countByStatus(ApplicationStatus status);
 
     @Query("SELECT ea FROM EventApplication ea WHERE " +
            "(:eventId IS NULL OR ea.event.id = :eventId) AND " +
