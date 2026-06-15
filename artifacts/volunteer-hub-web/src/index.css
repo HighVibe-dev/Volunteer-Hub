@@ -76,52 +76,52 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Warm, human, purposeful palette. Saffron/orange for primary, deep earthy greens/blues for balance. */
+  /* Forest green primary — NayePankh brand */
   --background: 40 33% 98%; /* Warm off-white #FAF8F5 */
   --foreground: 220 20% 15%; /* Deep charcoal/slate #1F242C */
 
   --border: 40 15% 85%; /* Soft grey-beige #DBD7D1 */
-  --input: 40 15% 85%; 
-  --ring: 28 85% 55%; /* Saffron/orange */
+  --input: 40 15% 85%;
+  --ring: 150 38% 16%; /* Dark green #1a3a2a */
 
   --card: 0 0% 100%; /* Pure white for cards */
   --card-foreground: 220 20% 15%;
-  --card-border: 40 15% 90%; 
+  --card-border: 40 15% 90%;
 
   --popover: 0 0% 100%;
   --popover-foreground: 220 20% 15%;
   --popover-border: 40 15% 90%;
 
-  /* Saffron inspired - NayePankh */
-  --primary: 28 85% 55%; /* #EE7F31 */
+  /* Dark forest green — NayePankh */
+  --primary: 150 38% 16%; /* #1a3a2a */
   --primary-foreground: 0 0% 100%; /* White */
 
-  --secondary: 170 30% 35%; /* Deep teal/green #3F746A */
+  --secondary: 150 25% 40%; /* Medium green */
   --secondary-foreground: 0 0% 100%;
 
-  --muted: 40 20% 92%; /* Light beige */
-  --muted-foreground: 40 10% 45%; 
+  --muted: 150 10% 93%; /* Light green-grey */
+  --muted-foreground: 150 8% 42%;
 
-  --accent: 40 20% 92%; 
-  --accent-foreground: 28 85% 50%; /* Darker saffron */
+  --accent: 150 10% 93%;
+  --accent-foreground: 150 38% 18%; /* Dark green */
 
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
 
-  --chart-1: 28 85% 55%; 
+  --chart-1: 150 38% 28%; /* #2d6a4f — visible green for charts */
   --chart-2: 170 30% 35%;
   --chart-3: 45 90% 55%;
   --chart-4: 210 50% 50%;
   --chart-5: 340 40% 50%;
 
-  --sidebar: 40 33% 96%;
-  --sidebar-foreground: 220 20% 20%;
-  --sidebar-border: 40 15% 85%;
-  --sidebar-primary: 28 85% 55%;
+  --sidebar: 150 20% 96%;
+  --sidebar-foreground: 150 30% 15%;
+  --sidebar-border: 150 15% 86%;
+  --sidebar-primary: 150 38% 16%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 40 20% 90%;
-  --sidebar-accent-foreground: 220 20% 15%;
-  --sidebar-ring: 28 85% 55%;
+  --sidebar-accent: 150 12% 91%;
+  --sidebar-accent-foreground: 150 30% 15%;
+  --sidebar-ring: 150 38% 16%;
 
   --app-font-sans: "Poppins", "DM Sans", sans-serif;
   --app-font-serif: "Poppins", Georgia, serif;
@@ -151,7 +151,7 @@
 
   --border: 220 15% 20%; 
   --input: 220 15% 20%;
-  --ring: 28 85% 55%;
+  --ring: 150 45% 35%;
 
   --card: 220 20% 14%;
   --card-foreground: 40 20% 90%;
@@ -161,22 +161,22 @@
   --popover-foreground: 40 20% 90%;
   --popover-border: 220 15% 20%;
 
-  --primary: 28 85% 55%; 
+  --primary: 150 45% 35%; /* Lighter green for dark mode */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 170 30% 35%;
+  --secondary: 150 25% 45%;
   --secondary-foreground: 0 0% 100%;
 
   --muted: 220 15% 20%;
   --muted-foreground: 220 10% 60%;
 
   --accent: 220 15% 20%;
-  --accent-foreground: 28 85% 65%; /* Lighter saffron for dark mode */
+  --accent-foreground: 150 45% 55%; /* Light green for dark mode */
 
   --destructive: 0 60% 45%;
   --destructive-foreground: 0 0% 100%;
 
-  --chart-1: 28 85% 55%;
+  --chart-1: 150 45% 40%;
   --chart-2: 170 30% 45%;
   --chart-3: 45 90% 55%;
   --chart-4: 210 50% 55%;
@@ -185,11 +185,11 @@
   --sidebar: 220 20% 12%;
   --sidebar-foreground: 40 20% 90%;
   --sidebar-border: 220 15% 18%;
-  --sidebar-primary: 28 85% 55%;
+  --sidebar-primary: 150 45% 35%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 220 15% 18%;
   --sidebar-accent-foreground: 40 20% 95%;
-  --sidebar-ring: 28 85% 55%;
+  --sidebar-ring: 150 45% 35%;
 }
 
 @layer base {

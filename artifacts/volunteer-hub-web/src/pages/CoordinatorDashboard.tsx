@@ -143,7 +143,7 @@ export default function CoordinatorDashboard() {
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip contentStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="enrolled" name="Enrolled" fill="#EE7F31" radius={[4, 4, 0, 0]} stackId="a" />
+                  <Bar dataKey="enrolled" name="Enrolled" fill="#2d6a4f" radius={[4, 4, 0, 0]} stackId="a" />
                   <Bar dataKey="spots" name="Open Spots" fill="#3F746A" radius={[4, 4, 0, 0]} stackId="a" />
                 </BarChart>
               </ResponsiveContainer>

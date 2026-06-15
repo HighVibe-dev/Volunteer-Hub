@@ -24,7 +24,7 @@ import {
 } from "recharts";
 import { Link } from "wouter";
 
-const CHART_COLORS = ["#EE7F31", "#3F746A", "#E8C547", "#6366F1"];
+const CHART_COLORS = ["#2d6a4f", "#3F746A", "#E8C547", "#6366F1"];
 
 function StatCard({ title, value, icon: Icon, description, variant = "default" }: {
   title: string; value: string | number; icon: any; description?: string; variant?: "default" | "warning" | "success";
@@ -146,8 +146,8 @@ export default function AdminDashboard() {
                 <AreaChart data={trends} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
                   <defs>
                     <linearGradient id="colorVolAdm" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EE7F31" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#EE7F31" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#2d6a4f" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#2d6a4f" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorHrsAdm" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3F746A" stopOpacity={0.3} />
@@ -159,7 +159,7 @@ export default function AdminDashboard() {
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip contentStyle={{ fontSize: 12 }} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Area type="monotone" dataKey="volunteers" name="Volunteers" stroke="#EE7F31" fill="url(#colorVolAdm)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="volunteers" name="Volunteers" stroke="#2d6a4f" fill="url(#colorVolAdm)" strokeWidth={2} />
                   <Area type="monotone" dataKey="hoursLogged" name="Hours" stroke="#3F746A" fill="url(#colorHrsAdm)" strokeWidth={2} />
                   <Area type="monotone" dataKey="eventsHeld" name="Events" stroke="#6366F1" fill="none" strokeWidth={1.5} strokeDasharray="4 2" />
                 </AreaChart>

@@ -227,7 +227,7 @@ export default function Profile() {
 
       {/* ── Hero Card ─────────────────────────────────────────────────────────── */}
       <Card className="overflow-hidden">
-        <div className="h-20 bg-gradient-to-r from-[#EE7F31] to-[#FFB347]" />
+        <div className="h-20 bg-gradient-to-r from-[#1a3a2a] to-[#2d6a4f]" />
         <CardContent className="pt-0 pb-6 px-6">
           <div className="flex items-end gap-4 -mt-10">
             {/* Avatar */}
@@ -239,7 +239,7 @@ export default function Profile() {
                 {avatarSrc ? (
                   <img src={avatarSrc} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#EE7F31] text-white text-2xl font-bold">
+                  <div className="w-full h-full flex items-center justify-center bg-[#1a3a2a] text-white text-2xl font-bold">
                     {getInitials(displayName)}
                   </div>
                 )}

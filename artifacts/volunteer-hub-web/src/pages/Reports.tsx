@@ -33,7 +33,7 @@ async function downloadReportCsv(endpoint: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-const COLORS = ["#EE7F31", "#3F746A", "#E8C547", "#6366F1", "#EC4899", "#14B8A6"];
+const COLORS = ["#2d6a4f", "#3F746A", "#E8C547", "#6366F1", "#EC4899", "#14B8A6"];
 
 function ParticipationReport() {
   const [page, setPage] = useState(0);
@@ -75,7 +75,7 @@ function ParticipationReport() {
               <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-20} textAnchor="end" />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip contentStyle={{ fontSize: 12 }} />
-              <Bar dataKey="hours" name="Hours" fill="#EE7F31" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="hours" name="Hours" fill="#2d6a4f" radius={[4, 4, 0, 0]} />
               <Bar dataKey="events" name="Events" fill="#3F746A" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -179,7 +179,7 @@ function AttendanceReport() {
               <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-20} textAnchor="end" />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip contentStyle={{ fontSize: 12 }} />
-              <Bar dataKey="checkedIn" name="Checked In" fill="#EE7F31" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="checkedIn" name="Checked In" fill="#2d6a4f" radius={[4, 4, 0, 0]} />
               <Bar dataKey="hours" name="Total Hours" fill="#3F746A" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

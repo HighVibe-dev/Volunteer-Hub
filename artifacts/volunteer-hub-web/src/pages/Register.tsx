@@ -237,7 +237,7 @@ export default function Register() {
 
           <p className="auth-bottom-link">
             Already have an account?{" "}
-            <Link href="/login" style={{ fontWeight: 600, color: "#EE7F31", textDecoration: "none" }}
+            <Link href="/login" style={{ fontWeight: 600, color: "#1a3a2a", textDecoration: "none" }}
               onMouseOver={(e) => (e.currentTarget.style.textDecoration = "underline")}
               onMouseOut={(e) => (e.currentTarget.style.textDecoration = "none")}
             >

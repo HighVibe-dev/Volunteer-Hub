@@ -82,14 +82,14 @@ const stagger = { show: { transition: { staggerChildren: 0.08 } } };
 /* ─── Confetti burst ─── */
 
 const CONFETTI_CFG = [
-  { x: 10, dy: -85, dx: -20, color: "#EE7F31", delay: 0 },
+  { x: 10, dy: -85, dx: -20, color: "#1a3a2a", delay: 0 },
   { x: 26, dy: -100, dx: 15, color: "#f59e0b", delay: 0.06 },
   { x: 42, dy: -90, dx: -10, color: "#10b981", delay: 0.12 },
   { x: 58, dy: -110, dx: 20, color: "#3b82f6", delay: 0.18 },
   { x: 74, dy: -80, dx: -25, color: "#ec4899", delay: 0.24 },
   { x: 90, dy: -95, dx: 10, color: "#8b5cf6", delay: 0.30 },
   { x: 18, dy: -70, dx: 30, color: "#f59e0b", delay: 0.36 },
-  { x: 34, dy: -115, dx: -15, color: "#EE7F31", delay: 0.42 },
+  { x: 34, dy: -115, dx: -15, color: "#1a3a2a", delay: 0.42 },
   { x: 50, dy: -75, dx: 25, color: "#10b981", delay: 0.48 },
   { x: 66, dy: -105, dx: -30, color: "#ec4899", delay: 0.54 },
   { x: 82, dy: -85, dx: 15, color: "#3b82f6", delay: 0.60 },
@@ -144,7 +144,7 @@ function HeroBanner({ firstName, hours, quoteIdx }: { firstName: string; hours: 
             </div>
             <div className="w-full bg-white/20 rounded-full h-2">
               <motion.div
-                className="h-2 rounded-full bg-gradient-to-r from-[#EE7F31] to-orange-300"
+                className="h-2 rounded-full bg-gradient-to-r from-[#1a3a2a] to-[#2d6a4f]"
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
                 transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
@@ -160,7 +160,7 @@ function HeroBanner({ firstName, hours, quoteIdx }: { firstName: string; hours: 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.5 }}
-              className="text-white/80 text-sm italic border-l-2 border-[#EE7F31] pl-3 leading-relaxed"
+              className="text-white/80 text-sm italic border-l-2 border-[#2d6a4f] pl-3 leading-relaxed"
             >
               "{QUOTES[quoteIdx]}"
             </motion.blockquote>
@@ -260,7 +260,7 @@ function VolunteerJourney({ profile, certCount }: { profile: any; certCount: num
                 <motion.div
                   animate={
                     isCurrent
-                      ? { boxShadow: ["0 0 0px #EE7F31", "0 0 14px #EE7F3199", "0 0 0px #EE7F31"] }
+                      ? { boxShadow: ["0 0 0px #1a3a2a", "0 0 14px #1a3a2a99", "0 0 0px #1a3a2a"] }
                       : m.done
                       ? {}
                       : {}
@@ -270,7 +270,7 @@ function VolunteerJourney({ profile, certCount }: { profile: any; certCount: num
                     m.done
                       ? "bg-primary border-primary text-white"
                       : isCurrent
-                      ? "bg-orange-100 border-primary/60 text-primary"
+                      ? "bg-green-100 border-primary/60 text-primary"
                       : "bg-muted border-muted-foreground/20 text-muted-foreground"
                   }`}
                 >
@@ -315,7 +315,7 @@ function AchievementBadges({ hours, events, certCount, rank }: { hours: number; 
               whileHover={{ scale: 1.07 }}
               className={`flex flex-col items-center gap-1.5 min-w-[76px] p-3 rounded-xl border-2 transition-all shrink-0 ${
                 b.unlocked
-                  ? "border-[#EE7F31] bg-orange-50 dark:bg-orange-950/20 shadow-md"
+                  ? "border-[#1a3a2a] bg-green-50 dark:bg-green-950/20 shadow-md"
                   : "border-muted bg-muted/30 opacity-45"
               }`}
             >
@@ -361,7 +361,7 @@ function MonthlyChallenge({ eventsThisMonth }: { eventsThisMonth: number }) {
   }
 
   return (
-    <Card className="relative border-0 shadow-md bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/10 overflow-hidden">
+    <Card className="relative border-0 shadow-md bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/10 overflow-hidden">
       <ConfettiBurst active={showConfetti} />
       <CardContent className="pt-5">
         <div className="flex items-center gap-2 mb-3">
@@ -376,7 +376,7 @@ function MonthlyChallenge({ eventsThisMonth }: { eventsThisMonth: number }) {
             <div className="flex items-center gap-3 mb-2">
               <div className="flex-1 bg-muted rounded-full h-3">
                 <motion.div
-                  className="h-3 rounded-full bg-gradient-to-r from-primary to-orange-400"
+                  className="h-3 rounded-full bg-gradient-to-r from-primary to-[#2d6a4f]"
                   initial={{ width: 0 }}
                   animate={{ width: `${pct}%` }}
                   transition={{ duration: 1, ease: "easeOut" }}
@@ -480,7 +480,7 @@ function EventCard({ event, isApplied: initialApplied }: { event: any; isApplied
     "from-violet-500 to-indigo-500",
     "from-teal-500 to-cyan-500",
     "from-rose-500 to-pink-500",
-    "from-amber-500 to-orange-500",
+    "from-[#1a3a2a] to-[#2d6a4f]",
   ];
   const gradient = GRADIENTS[(event.id ?? 0) % GRADIENTS.length];
   const spots = (event.maxParticipants ?? 0) - (event.currentParticipants ?? 0);
@@ -732,15 +732,15 @@ export default function VolunteerDashboard() {
 
       {/* Animated stat cards */}
       <motion.div variants={stagger} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Hours Volunteered"  value={hours}                icon={Clock}    bg="bg-orange-500" />
+        <StatCard label="Hours Volunteered"  value={hours}                icon={Clock}    bg="bg-[#1a3a2a]" />
         <StatCard label="Events Attended"    value={events}               icon={Calendar} bg="bg-teal-500"   />
         <StatCard label="Certificates"       value={certCount}            icon={Award}    bg="bg-violet-500" />
-        <StatCard label="Badge Level"        value={BADGE_ORDINAL[profile?.badgeLevel ?? "NONE"] ?? 0} icon={Trophy}   bg="bg-amber-500"  />
+        <StatCard label="Badge Level"        value={BADGE_ORDINAL[profile?.badgeLevel ?? "NONE"] ?? 0} icon={Trophy}   bg="bg-[#2d6a4f]"  />
       </motion.div>
 
       {/* Share impact strip */}
       <motion.div variants={fadeUp}>
-        <div className="flex items-center gap-3 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/10 rounded-xl px-5 py-4 border border-orange-200/50">
+        <div className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/10 rounded-xl px-5 py-4 border border-green-200/50">
           <Heart className="h-5 w-5 text-primary shrink-0" />
           <div className="min-w-0 flex-1">
             <div className="font-semibold text-sm text-primary">My Volunteering Impact</div>

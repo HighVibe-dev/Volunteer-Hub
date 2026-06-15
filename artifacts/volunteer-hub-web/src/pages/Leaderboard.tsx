@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Trophy, Clock, Calendar } from "lucide-react";
 
-const RANK_COLORS = ["#EE7F31", "#C0C0C0", "#CD7F32"];
+const RANK_COLORS = ["#2d6a4f", "#C0C0C0", "#CD7F32"];
 
 type Period = "weekly" | "monthly" | "all-time";
 
@@ -71,7 +71,7 @@ export default function Leaderboard() {
                 <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm shrink-0 ${
                   idx === 0 ? "bg-amber-100 text-amber-700" :
                   idx === 1 ? "bg-gray-100 text-gray-600" :
-                  idx === 2 ? "bg-orange-100 text-orange-700" :
+                  idx === 2 ? "bg-green-100 text-green-800" :
                   "bg-muted text-muted-foreground"
                 }`}>
                   {idx < 3 ? <Trophy className="h-4 w-4" /> : entry.rank}
@@ -119,9 +119,9 @@ export default function Leaderboard() {
                       formatter={(val: number) => [`${val}h`, "Hours"]}
                       contentStyle={{ fontSize: 12 }}
                     />
-                    <Bar dataKey="hours" fill="#EE7F31" radius={[0, 4, 4, 0]}>
+                    <Bar dataKey="hours" fill="#2d6a4f" radius={[0, 4, 4, 0]}>
                       {chartData.map((_, index) => (
-                        <Cell key={index} fill={RANK_COLORS[index] ?? "#EE7F31"} opacity={index < 3 ? 1 : 0.7} />
+                        <Cell key={index} fill={RANK_COLORS[index] ?? "#2d6a4f"} opacity={index < 3 ? 1 : 0.7} />
                       ))}
                     </Bar>
                   </BarChart>

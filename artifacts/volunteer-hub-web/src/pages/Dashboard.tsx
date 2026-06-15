@@ -20,7 +20,7 @@ import {
 } from "recharts";
 import { Link } from "wouter";
 
-const CHART_COLORS = ["#EE7F31", "#3F746A", "#E8C547", "#6366F1"];
+const CHART_COLORS = ["#2d6a4f", "#3F746A", "#E8C547", "#6366F1"];
 
 function StatCard({
   title, value, icon: Icon, description, trend,
@@ -159,8 +159,8 @@ export default function Dashboard() {
                 <AreaChart data={trends} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
                   <defs>
                     <linearGradient id="colorVolunteers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EE7F31" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#EE7F31" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#2d6a4f" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#2d6a4f" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3F746A" stopOpacity={0.3} />
@@ -172,7 +172,7 @@ export default function Dashboard() {
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip contentStyle={{ fontSize: 12 }} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Area type="monotone" dataKey="volunteers" name="Volunteers" stroke="#EE7F31" fill="url(#colorVolunteers)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="volunteers" name="Volunteers" stroke="#2d6a4f" fill="url(#colorVolunteers)" strokeWidth={2} />
                   <Area type="monotone" dataKey="hoursLogged" name="Hours" stroke="#3F746A" fill="url(#colorHours)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -263,7 +263,7 @@ export default function Dashboard() {
                     <div className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold shrink-0 ${
                       idx === 0 ? "bg-amber-100 text-amber-700" :
                       idx === 1 ? "bg-gray-100 text-gray-600" :
-                      idx === 2 ? "bg-orange-100 text-orange-700" :
+                      idx === 2 ? "bg-green-100 text-green-800" :
                       "bg-muted text-muted-foreground"
                     }`}>
                       {idx + 1}
