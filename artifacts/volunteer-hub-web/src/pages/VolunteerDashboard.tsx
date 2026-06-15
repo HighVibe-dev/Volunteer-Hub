@@ -296,6 +296,26 @@ function VolunteerJourney({ profile, certCount }: { profile: any; certCount: num
             );
           })}
         </div>
+
+        {/* Motivational strip */}
+        <div className="relative mt-5 rounded-xl overflow-hidden flex items-center gap-3 px-4 py-3"
+          style={{ background: "linear-gradient(to right, #e8f5e9, #f1f8e9)" }}>
+          <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0">
+            <Star className="h-4 w-4 text-white fill-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold text-primary">You're on your way!</div>
+            <div className="text-xs text-muted-foreground">Keep going, every small step creates a big impact.</div>
+          </div>
+          {/* Decorative leaves */}
+          <svg className="absolute right-0 top-0 h-full opacity-30 pointer-events-none" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 120 }}>
+            <path d="M90 55 Q100 20 120 5" stroke="#2d6a4f" strokeWidth="1.5" fill="none"/>
+            <path d="M100 55 Q118 30 120 10" stroke="#2d6a4f" strokeWidth="1.5" fill="none"/>
+            <ellipse cx="105" cy="30" rx="10" ry="6" fill="#4caf50" transform="rotate(-30 105 30)"/>
+            <ellipse cx="115" cy="18" rx="8" ry="5" fill="#66bb6a" transform="rotate(-50 115 18)"/>
+            <ellipse cx="95" cy="42" rx="9" ry="5" fill="#81c784" transform="rotate(-15 95 42)"/>
+          </svg>
+        </div>
       </CardContent>
     </Card>
   );
