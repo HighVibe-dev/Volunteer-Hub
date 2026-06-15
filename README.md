@@ -6,6 +6,10 @@ NayePankh Volunteer Hub is a full-stack web platform built to bring order, trans
 
 ---
 
+![NayePankh Login Page](attached_assets/screenshots/login-page.jpg)
+
+---
+
 ## What Problem Does It Solve?
 
 Managing volunteers manually is chaos. WhatsApp groups get cluttered. Spreadsheets go out of date. Certificates get lost. Nobody knows who showed up to what. NayePankh Volunteer Hub fixes all of that in one place — event management, attendance tracking, certificates, leaderboards, reports, and more — with every user seeing exactly what they need and nothing they don't.
