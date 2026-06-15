@@ -125,15 +125,21 @@ function HeroBanner({ firstName, hours, quoteIdx }: { firstName: string; hours: 
   return (
     <div
       className="relative w-full rounded-2xl overflow-hidden"
-      style={{ minHeight: 240, background: "#0d1f17" }}
+      style={{ minHeight: 240, background: "#000" }}
     >
+      {/* Image occupies right 75% */}
       <img
         src={bannerBg}
         alt=""
         aria-hidden
-        className="absolute right-0 top-0 h-full w-auto max-w-none object-cover pointer-events-none select-none"
+        className="absolute right-0 top-0 h-full pointer-events-none select-none"
+        style={{ width: "75%", objectFit: "cover", objectPosition: "center" }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20" />
+      {/* Solid black left → fades to transparent at ~50% */}
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to right, #000 28%, #000 30%, transparent 52%)" }}
+      />
       <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end gap-6 p-6 min-h-[220px]">
         <div className="flex-1">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">Welcome back, {firstName} 👋</h1>
