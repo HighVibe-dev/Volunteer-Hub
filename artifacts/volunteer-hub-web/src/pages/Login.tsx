@@ -85,7 +85,7 @@ export default function Login() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <AuthHeroPanel />
 
       <div className="auth-right-panel">
