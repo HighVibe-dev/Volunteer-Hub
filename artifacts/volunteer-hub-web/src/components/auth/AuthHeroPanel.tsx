@@ -1,4 +1,4 @@
-import volunteerPhoto from "@assets/image_1781509416149.png";
+import volunteerPhoto from "@assets/image_1781511411041.png";
 import { Handshake, Users, Sprout } from "lucide-react";
 
 const STATS = [
