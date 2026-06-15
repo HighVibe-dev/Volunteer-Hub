@@ -455,13 +455,18 @@ function NGOStoryWidget({ stats, volunteerHours }: { stats: PublicStats | undefi
 
 /* ─── Event card with Apply button ─── */
 
-function EventCard({ event, isApplied }: { event: any; isApplied: boolean }) {
+function EventCard({ event, isApplied: initialApplied }: { event: any; isApplied: boolean }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [applied, setApplied] = useState(initialApplied);
+
+  useEffect(() => { setApplied(initialApplied); }, [initialApplied]);
+
   const { mutate: apply, isPending } = useApplyToEvent({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getListApplicationsQueryKey({ size: 5 }) });
+        setApplied(true);
+        queryClient.invalidateQueries({ queryKey: getListApplicationsQueryKey({ size: 200 }) });
         toast({ title: "Applied successfully! 🎉", description: `You've applied to ${event.title}` });
       },
       onError: (err: any) => {
@@ -510,7 +515,7 @@ function EventCard({ event, isApplied }: { event: any; isApplied: boolean }) {
               View
             </Button>
           </Link>
-          {isApplied ? (
+          {applied ? (
             <Button size="sm" className="flex-1 text-xs h-8 bg-green-600 hover:bg-green-600 cursor-default gap-1" disabled>
               <CheckCircle2 className="h-3 w-3" /> Applied ✓
             </Button>
