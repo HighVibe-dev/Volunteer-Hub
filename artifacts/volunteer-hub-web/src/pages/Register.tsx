@@ -13,6 +13,7 @@ import { getRoleDashboardPath } from "@/App";
 import { AuthHeroPanel } from "@/components/auth/AuthHeroPanel";
 import { Mail, Lock, User, Phone, MapPin } from "lucide-react";
 import "@/components/auth/auth.css";
+import volunteerPhoto from "@assets/image_1781511411041.png";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -75,16 +76,17 @@ export default function Register() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="auth-page-root">
       <AuthHeroPanel />
 
       <div className="auth-right-panel">
+        {/* Mobile full-width photo banner */}
+        <div className="auth-mobile-hero" style={{ backgroundImage: `url(${volunteerPhoto})` }}>
+          <div className="auth-mobile-hero-overlay" />
+          <img src="/nayepankh-logo.png" alt="NayePankh" className="auth-mobile-hero-logo" />
+        </div>
+
         <div className="auth-right-inner" style={{ maxWidth: "30rem" }}>
-          {/* Mobile branded header */}
-          <div className="auth-mobile-logo">
-            <img src="/nayepankh-logo.png" alt="NayePankh" style={{ height: "4rem", width: "auto" }} />
-            <span style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground)", fontWeight: 500 }}>Volunteer Hub</span>
-          </div>
 
           {/* Heading */}
           <div className="auth-right-heading">

@@ -183,38 +183,77 @@
 
 /* ─── Auth Right Panel ────────────────────────────────────────────────────── */
 
+.auth-page-root {
+  display: flex;
+  min-height: 100vh;
+}
+@media (min-width: 1024px) {
+  .auth-page-root { height: 100vh; overflow: hidden; }
+}
+
 .auth-right-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  overflow: hidden;
-  padding: 1.5rem;
+  align-items: stretch;
+  min-height: 100vh;
   background: #ffffff;
+  overflow-y: auto;
+}
+@media (min-width: 1024px) {
+  .auth-right-panel {
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    padding: 1.5rem;
+  }
 }
 
 .auth-right-inner {
   width: 100%;
   max-width: 26rem;
+  padding: 1.5rem 1.25rem 2rem;
   animation: auth-fade-up-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: 0.15s;
 }
-
-/* Mobile logo banner */
-.auth-mobile-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.75rem;
-  padding: 0.875rem 1.125rem;
-  border-radius: 14px;
-  background: #f0ebe0;
-  border: 1px solid rgba(26,58,42,0.1);
+@media (min-width: 1024px) {
+  .auth-right-inner { padding: 0; margin: 0 auto; }
 }
-@media (min-width: 1024px) { .auth-mobile-logo { display: none; } }
-.auth-mobile-logo img { width: 80px; height: 80px; object-fit: contain; }
+
+/* Mobile photo hero banner */
+.auth-mobile-hero {
+  position: relative;
+  width: 100%;
+  height: 38vw;
+  max-height: 260px;
+  min-height: 160px;
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+@media (min-width: 1024px) { .auth-mobile-hero { display: none; } }
+
+.auth-mobile-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(26,58,42,0.15) 0%,
+    rgba(26,58,42,0.45) 100%
+  );
+}
+
+.auth-mobile-hero-logo {
+  position: absolute;
+  bottom: 1rem;
+  left: 1.25rem;
+  height: 3.5rem;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+}
 
 /* Heading */
 .auth-right-heading { margin-bottom: 1.1rem; }

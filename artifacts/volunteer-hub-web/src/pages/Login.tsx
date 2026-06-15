@@ -13,6 +13,7 @@ import { getRoleDashboardPath } from "@/App";
 import { AuthHeroPanel } from "@/components/auth/AuthHeroPanel";
 import { Mail, Lock, ShieldCheck, Users, BadgeCheck, Building2 } from "lucide-react";
 import "@/components/auth/auth.css";
+import volunteerPhoto from "@assets/image_1781511411041.png";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -85,16 +86,17 @@ export default function Login() {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+    <div className="auth-page-root">
       <AuthHeroPanel />
 
       <div className="auth-right-panel">
+        {/* Mobile full-width photo banner */}
+        <div className="auth-mobile-hero" style={{ backgroundImage: `url(${volunteerPhoto})` }}>
+          <div className="auth-mobile-hero-overlay" />
+          <img src="/nayepankh-logo.png" alt="NayePankh" className="auth-mobile-hero-logo" />
+        </div>
+
         <div className="auth-right-inner">
-          {/* Mobile branded header */}
-          <div className="auth-mobile-logo">
-            <img src="/nayepankh-logo.png" alt="NayePankh" style={{ height: "4rem", width: "auto" }} />
-            <span style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground)", fontWeight: 500 }}>Volunteer Hub</span>
-          </div>
 
           {/* Heading */}
           <div className="auth-right-heading">
