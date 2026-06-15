@@ -6,6 +6,7 @@
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/controller/LeaderboardController.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/dto/event/EventRequirementResponse.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/dto/report/ReportRow.java
+/home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/dto/dashboard/PublicStatsResponse.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/exception/BadRequestException.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/enums/BadgeLevel.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/repository/SkillRepository.java
@@ -53,6 +54,7 @@
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/controller/DashboardController.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/config/DataSourceConfig.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/entity/Notification.java
+/home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/controller/StatsController.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/dto/certificate/CertificateResponse.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/controller/AttendanceController.java
 /home/runner/workspace/artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/dto/event/EventRequest.java

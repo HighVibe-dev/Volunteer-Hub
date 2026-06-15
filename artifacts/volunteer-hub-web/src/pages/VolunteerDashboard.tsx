@@ -1,23 +1,35 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  useGetDashboardStats, getGetDashboardStatsQueryKey,
   useGetLeaderboard, getGetLeaderboardQueryKey,
   useListEvents, getListEventsQueryKey,
   useListApplications, getListApplicationsQueryKey,
   useListCertificates, getListCertificatesQueryKey,
   useGetMyProfile, getGetMyProfileQueryKey,
+  useApplyToEvent,
   ListEventsStatus,
 } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Calendar, Clock, Award, ClipboardList, Trophy, CalendarDays, MapPin,
-  Users, Flame, Lock, CheckCircle2, BookOpen, Heart, Star,
+  Users, Flame, Lock, CheckCircle2, BookOpen, Heart, Star, Share2, Gift,
 } from "lucide-react";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
+
+/* ─── types ─── */
+
+interface PublicStats {
+  totalVolunteers: number;
+  totalEvents: number;
+  eventsThisMonth: number;
+  totalVolunteerHours: number;
+  certificatesIssued: number;
+}
 
 /* ─── helpers ─── */
 
@@ -41,9 +53,8 @@ function useCountUp(target: number, duration = 1100) {
   const [count, setCount] = useState(0);
   const done = useRef(false);
   useEffect(() => {
-    if (done.current) return;
+    if (done.current || target === 0) return;
     done.current = true;
-    if (target === 0) return;
     const t0 = Date.now();
     const id = setInterval(() => {
       const p = Math.min((Date.now() - t0) / duration, 1);
@@ -55,8 +66,48 @@ function useCountUp(target: number, duration = 1100) {
   return count;
 }
 
-const fadeUp   = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
-const stagger  = { show: { transition: { staggerChildren: 0.08 } } };
+function fmtNum(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
+  return String(n);
+}
+
+const fadeUp  = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+const stagger = { show: { transition: { staggerChildren: 0.08 } } };
+
+/* ─── Confetti burst ─── */
+
+const CONFETTI_CFG = [
+  { x: 10, dy: -85, dx: -20, color: "#EE7F31", delay: 0 },
+  { x: 26, dy: -100, dx: 15, color: "#f59e0b", delay: 0.06 },
+  { x: 42, dy: -90, dx: -10, color: "#10b981", delay: 0.12 },
+  { x: 58, dy: -110, dx: 20, color: "#3b82f6", delay: 0.18 },
+  { x: 74, dy: -80, dx: -25, color: "#ec4899", delay: 0.24 },
+  { x: 90, dy: -95, dx: 10, color: "#8b5cf6", delay: 0.30 },
+  { x: 18, dy: -70, dx: 30, color: "#f59e0b", delay: 0.36 },
+  { x: 34, dy: -115, dx: -15, color: "#EE7F31", delay: 0.42 },
+  { x: 50, dy: -75, dx: 25, color: "#10b981", delay: 0.48 },
+  { x: 66, dy: -105, dx: -30, color: "#ec4899", delay: 0.54 },
+  { x: 82, dy: -85, dx: 15, color: "#3b82f6", delay: 0.60 },
+  { x: 24, dy: -95, dx: -5, color: "#8b5cf6", delay: 0.66 },
+];
+
+function ConfettiBurst({ active }: { active: boolean }) {
+  if (!active) return null;
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
+      {CONFETTI_CFG.map((p, i) => (
+        <motion.div
+          key={i}
+          className="absolute bottom-4 rounded-sm"
+          style={{ width: 7, height: 7, left: `${p.x}%`, backgroundColor: p.color }}
+          initial={{ y: 0, x: 0, opacity: 1, scale: 0 }}
+          animate={{ y: p.dy, x: p.dx, opacity: 0, scale: 1.2 }}
+          transition={{ duration: 1.3, delay: p.delay, ease: "easeOut" }}
+        />
+      ))}
+    </div>
+  );
+}
 
 /* ─── Hero banner ─── */
 
@@ -134,25 +185,33 @@ function StatCard({ label, value, icon: Icon, bg }: { label: string; value: numb
   );
 }
 
-/* ─── NGO impact strip ─── */
+/* ─── Community impact strip (real data) ─── */
 
-function ImpactStrip() {
+function ImpactStatItem({ icon: Icon, value, label }: { icon: any; value: number; label: string }) {
+  const count = useCountUp(value);
+  return (
+    <div className="flex items-center gap-3 bg-primary/5 border border-primary/10 rounded-xl px-4 py-3">
+      <Icon className="h-5 w-5 text-primary shrink-0" />
+      <div>
+        <div className="font-bold text-sm">{fmtNum(count)}+</div>
+        <div className="text-xs text-muted-foreground">{label}</div>
+      </div>
+    </div>
+  );
+}
+
+function ImpactStrip({ stats }: { stats: PublicStats | undefined }) {
+  const volunteers = stats?.totalVolunteers ?? 0;
+  const events     = stats?.totalEvents ?? 0;
+  const hours      = stats?.totalVolunteerHours ? Math.round(stats.totalVolunteerHours) : 0;
+  const certs      = stats?.certificatesIssued ?? 0;
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      {([
-        { icon: Users,    val: "500+",    label: "Volunteers" },
-        { icon: Calendar, val: "120+",    label: "Events Conducted" },
-        { icon: Clock,    val: "10,000+", label: "Volunteer Hours" },
-        { icon: Heart,    val: "15+",     label: "Communities Reached" },
-      ] as const).map((it) => (
-        <div key={it.label} className="flex items-center gap-3 bg-primary/5 border border-primary/10 rounded-xl px-4 py-3">
-          <it.icon className="h-5 w-5 text-primary shrink-0" />
-          <div>
-            <div className="font-bold text-sm">{it.val}</div>
-            <div className="text-xs text-muted-foreground">{it.label}</div>
-          </div>
-        </div>
-      ))}
+      <ImpactStatItem icon={Users}    value={volunteers} label="Volunteers" />
+      <ImpactStatItem icon={Calendar} value={events}     label="Events Conducted" />
+      <ImpactStatItem icon={Clock}    value={hours}      label="Volunteer Hours" />
+      <ImpactStatItem icon={Award}    value={certs}      label="Certificates Issued" />
     </div>
   );
 }
@@ -173,6 +232,8 @@ function VolunteerJourney({ profile, certCount }: { profile: any; certCount: num
     { label: "Community Champion",    sub: "", done: hours >= 100 },
   ];
 
+  const firstIncompletIdx = milestones.findIndex((m) => !m.done);
+
   return (
     <Card className="border-0 shadow-md">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -181,31 +242,42 @@ function VolunteerJourney({ profile, certCount }: { profile: any; certCount: num
       </CardHeader>
       <CardContent>
         <div className="relative flex flex-col md:flex-row gap-4 md:gap-0 md:items-start justify-between">
-          {milestones.map((m, i) => (
-            <div key={i} className="flex md:flex-col items-center flex-1 relative">
-              {i < milestones.length - 1 && (
-                <div
-                  className={`hidden md:block absolute top-5 h-0.5 z-0 ${m.done ? "bg-primary/50" : "bg-muted"}`}
-                  style={{ left: "calc(50% + 14px)", right: "calc(-50% + 14px)" }}
-                />
-              )}
-              <motion.div
-                animate={m.done ? { boxShadow: ["0 0 0px #EE7F31", "0 0 10px #EE7F3188", "0 0 0px #EE7F31"] } : {}}
-                transition={{ repeat: Infinity, duration: 2.8, delay: i * 0.25 }}
-                className={`w-10 h-10 rounded-full flex items-center justify-center border-2 shrink-0 z-10 ${
-                  m.done
-                    ? "bg-primary border-primary text-white"
-                    : "bg-muted border-muted-foreground/20 text-muted-foreground"
-                }`}
-              >
-                {m.done ? <CheckCircle2 className="h-5 w-5" /> : <Lock className="h-4 w-4" />}
-              </motion.div>
-              <div className="ml-3 md:ml-0 md:mt-2 md:text-center">
-                <div className="text-xs font-medium leading-tight">{m.label}</div>
-                {m.sub && <div className="text-[10px] text-muted-foreground mt-0.5">{m.sub}</div>}
+          {milestones.map((m, i) => {
+            const isCurrent = i === firstIncompletIdx;
+            return (
+              <div key={i} className="flex md:flex-col items-center flex-1 relative">
+                {i < milestones.length - 1 && (
+                  <div
+                    className={`hidden md:block absolute top-5 h-0.5 z-0 ${m.done ? "bg-primary/50" : "bg-muted"}`}
+                    style={{ left: "calc(50% + 14px)", right: "calc(-50% + 14px)" }}
+                  />
+                )}
+                <motion.div
+                  animate={
+                    isCurrent
+                      ? { boxShadow: ["0 0 0px #EE7F31", "0 0 14px #EE7F3199", "0 0 0px #EE7F31"] }
+                      : m.done
+                      ? {}
+                      : {}
+                  }
+                  transition={isCurrent ? { repeat: Infinity, duration: 1.8 } : {}}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 shrink-0 z-10 ${
+                    m.done
+                      ? "bg-primary border-primary text-white"
+                      : isCurrent
+                      ? "bg-orange-100 border-primary/60 text-primary"
+                      : "bg-muted border-muted-foreground/20 text-muted-foreground"
+                  }`}
+                >
+                  {m.done ? <CheckCircle2 className="h-5 w-5" /> : isCurrent ? <Flame className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                </motion.div>
+                <div className="ml-3 md:ml-0 md:mt-2 md:text-center">
+                  <div className={`text-xs font-medium leading-tight ${isCurrent ? "text-primary" : ""}`}>{m.label}</div>
+                  {m.sub && <div className="text-[10px] text-muted-foreground mt-0.5">{m.sub}</div>}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </CardContent>
     </Card>
@@ -254,13 +326,38 @@ function AchievementBadges({ hours, events, certCount, rank }: { hours: number; 
 
 /* ─── Monthly challenge ─── */
 
+function challengeClaimKey() {
+  const d = new Date();
+  return `np-challenge-claimed-${d.getMonth()}-${d.getFullYear()}`;
+}
+
 function MonthlyChallenge({ events }: { events: number }) {
   const goal = 2;
   const progress = Math.min(events, goal);
   const pct = Math.round((progress / goal) * 100);
+  const complete = progress >= goal;
+
+  const [claimed, setClaimed] = useState(() => !!localStorage.getItem(challengeClaimKey()));
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    if (complete && !claimed) {
+      setShowConfetti(true);
+      const t = setTimeout(() => setShowConfetti(false), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [complete, claimed]);
+
+  function handleClaim() {
+    localStorage.setItem(challengeClaimKey(), "1");
+    setClaimed(true);
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 2000);
+  }
 
   return (
-    <Card className="border-0 shadow-md bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/10">
+    <Card className="relative border-0 shadow-md bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/10 overflow-hidden">
+      <ConfettiBurst active={showConfetti} />
       <CardContent className="pt-5">
         <div className="flex items-center gap-2 mb-3">
           <Flame className="h-5 w-5 text-primary" />
@@ -282,9 +379,20 @@ function MonthlyChallenge({ events }: { events: number }) {
               </div>
               <span className="text-sm font-bold tabular-nums">{progress}/{goal}</span>
             </div>
-            {progress >= goal && (
-              <div className="text-xs text-green-600 font-medium flex items-center gap-1">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Challenge complete! 🎉
+            {complete && (
+              <div className="flex items-center justify-between mt-2">
+                <div className="text-xs text-green-600 font-medium flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Challenge complete! 🎉
+                </div>
+                {claimed ? (
+                  <span className="text-xs text-primary font-semibold flex items-center gap-1">
+                    <Gift className="h-3.5 w-3.5" /> Reward Claimed ✓
+                  </span>
+                ) : (
+                  <Button size="sm" className="h-7 text-xs gap-1 px-3" onClick={handleClaim}>
+                    <Gift className="h-3 w-3" /> Claim Reward
+                  </Button>
+                )}
               </div>
             )}
           </>
@@ -297,9 +405,24 @@ function MonthlyChallenge({ events }: { events: number }) {
   );
 }
 
-/* ─── NGO story widget ─── */
+/* ─── NGO story widget (real data) ─── */
 
-function NGOStoryWidget() {
+function NGOStatLine({ emoji, value, suffix }: { emoji: string; value: number; suffix: string }) {
+  const count = useCountUp(value);
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <span>{emoji}</span>
+      <span><strong className="tabular-nums">{fmtNum(count)}</strong> {suffix}</span>
+    </div>
+  );
+}
+
+function NGOStoryWidget({ stats, volunteerHours }: { stats: PublicStats | undefined; volunteerHours: number }) {
+  const totalHours = stats?.totalVolunteerHours ? Math.round(stats.totalVolunteerHours) : 0;
+  const totalEvents = stats?.totalEvents ?? 0;
+  const certs = stats?.certificatesIssued ?? 0;
+  const pct = totalHours > 0 ? Math.round((volunteerHours / totalHours) * 100) : 0;
+
   return (
     <Card className="border-0 shadow-md bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-950/20 dark:to-emerald-950/10">
       <CardContent className="pt-5">
@@ -309,26 +432,40 @@ function NGOStoryWidget() {
         </div>
         <p className="text-sm text-muted-foreground mb-3">Thanks to our volunteers:</p>
         <div className="space-y-2">
-          {[
-            { emoji: "🍱", text: "120 food kits distributed" },
-            { emoji: "📚", text: "80 children supported" },
-            { emoji: "🏠", text: "35 families assisted" },
-          ].map((item) => (
-            <div key={item.text} className="flex items-center gap-2 text-sm">
-              <span>{item.emoji}</span>
-              <span>{item.text}</span>
-            </div>
-          ))}
+          <NGOStatLine emoji="📅" value={totalEvents}     suffix="events organized" />
+          <NGOStatLine emoji="⏰" value={totalHours}      suffix="volunteer hours logged" />
+          <NGOStatLine emoji="📜" value={certs}           suffix="certificates awarded" />
         </div>
-        <p className="text-sm text-primary font-medium mt-3">Your contribution helps make this possible ❤️</p>
+        {volunteerHours > 0 && pct > 0 && (
+          <p className="text-xs text-teal-700 font-medium mt-3 bg-teal-100/60 dark:bg-teal-900/20 rounded-lg px-3 py-2">
+            Your {volunteerHours}h = <strong>{pct}%</strong> of our platform's total impact ❤️
+          </p>
+        )}
+        {volunteerHours > 0 && pct === 0 && (
+          <p className="text-sm text-primary font-medium mt-3">Your contribution helps make this possible ❤️</p>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-/* ─── Event card ─── */
+/* ─── Event card with Apply button ─── */
 
-function EventCard({ event }: { event: any }) {
+function EventCard({ event, isApplied }: { event: any; isApplied: boolean }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { mutate: apply, isPending } = useApplyToEvent({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListApplicationsQueryKey({ size: 5 }) });
+        toast({ title: "Applied successfully! 🎉", description: `You've applied to ${event.title}` });
+      },
+      onError: (err: any) => {
+        toast({ title: "Could not apply", description: err?.message ?? "Please try again later.", variant: "destructive" });
+      },
+    },
+  });
+
   const GRADIENTS = [
     "from-violet-500 to-indigo-500",
     "from-teal-500 to-cyan-500",
@@ -363,11 +500,27 @@ function EventCard({ event }: { event: any }) {
             {spots} spots left
           </span>
         )}
-        <Link href={`/events/${event.id}`}>
-          <Button size="sm" className="w-full mt-1 text-xs h-8 bg-primary hover:bg-primary/90">
-            Join Event
-          </Button>
-        </Link>
+        <div className="flex gap-2 mt-1">
+          <Link href={`/events/${event.id}`} className="flex-1">
+            <Button size="sm" variant="outline" className="w-full text-xs h-8">
+              View
+            </Button>
+          </Link>
+          {isApplied ? (
+            <Button size="sm" className="flex-1 text-xs h-8 bg-green-600 hover:bg-green-600 cursor-default gap-1" disabled>
+              <CheckCircle2 className="h-3 w-3" /> Applied ✓
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              className="flex-1 text-xs h-8 bg-primary hover:bg-primary/90"
+              disabled={isPending}
+              onClick={() => apply({ data: { eventId: event.id } })}
+            >
+              {isPending ? "Applying…" : "Apply Now"}
+            </Button>
+          )}
+        </div>
       </div>
     </motion.div>
   );
@@ -438,20 +591,27 @@ function LeaderboardWidget({ leaderboard, userId }: { leaderboard: any[]; userId
 /* ─── Main page ─── */
 
 export default function VolunteerDashboard() {
-  const { user }                  = useAuth();
-  const [quoteIdx, setQuoteIdx]   = useState(0);
+  const { user }                = useAuth();
+  const { toast }               = useToast();
+  const [quoteIdx, setQuoteIdx] = useState(0);
 
   useEffect(() => {
     const id = setInterval(() => setQuoteIdx((q) => (q + 1) % QUOTES.length), 5000);
     return () => clearInterval(id);
   }, []);
 
-  const { data: _stats, isLoading } = useGetDashboardStats({
-    query: { enabled: !!user, queryKey: getGetDashboardStatsQueryKey() },
+  const { data: profile, isLoading: profileLoading } = useGetMyProfile({
+    query: { queryKey: getGetMyProfileQueryKey() },
   });
 
-  const { data: profile } = useGetMyProfile({
-    query: { queryKey: getGetMyProfileQueryKey() },
+  const { data: publicStats } = useQuery<PublicStats>({
+    queryKey: ["public-stats"],
+    queryFn: async () => {
+      const res = await fetch("/api/stats/public");
+      const json = await res.json();
+      return json.data as PublicStats;
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: myApplications } = useListApplications(
@@ -481,6 +641,10 @@ export default function VolunteerDashboard() {
   const rankNum   = myRank >= 0 ? myRank + 1 : 0;
   const firstName = profile?.name?.split(" ")[0] ?? user?.firstName ?? "Volunteer";
 
+  const appliedEventIds = new Set(
+    myApplications?.content?.map((a) => a.eventId).filter(Boolean) ?? []
+  );
+
   const appStatusColors: Record<string, string> = {
     PENDING:   "bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300",
     APPROVED:  "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-300",
@@ -488,7 +652,15 @@ export default function VolunteerDashboard() {
     WITHDRAWN: "bg-gray-100 text-gray-600  dark:bg-gray-800      dark:text-gray-400",
   };
 
-  if (isLoading) {
+  const handleShareImpact = useCallback(() => {
+    const msg = `I've volunteered ${hours} hours and attended ${events} events with @NayePankh! 💛 #NayePankh #Volunteer #MakeADifference`;
+    navigator.clipboard.writeText(msg).then(
+      () => toast({ title: "Copied to clipboard! 📋", description: "Share your impact on social media." }),
+      () => toast({ title: "Copy failed", description: "Please copy the message manually.", variant: "destructive" })
+    );
+  }, [hours, events, toast]);
+
+  if (profileLoading) {
     return (
       <div className="space-y-5">
         <Skeleton className="h-[220px] w-full rounded-2xl" />
@@ -540,9 +712,31 @@ export default function VolunteerDashboard() {
         <StatCard label="Leaderboard Rank"   value={rankNum}   icon={Trophy}   bg="bg-amber-500"  />
       </motion.div>
 
+      {/* Share impact strip */}
+      <motion.div variants={fadeUp}>
+        <div className="flex items-center gap-3 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/10 rounded-xl px-5 py-4 border border-orange-200/50">
+          <Heart className="h-5 w-5 text-primary shrink-0" />
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-sm text-primary">My Volunteering Impact</div>
+            <div className="text-xs text-muted-foreground truncate">
+              {hours}h volunteered · {events} events · {certCount} certificate{certCount !== 1 ? "s" : ""}
+            </div>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="shrink-0 gap-1.5 text-xs border-primary/30 text-primary hover:bg-primary/5"
+            onClick={handleShareImpact}
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            Share
+          </Button>
+        </div>
+      </motion.div>
+
       {/* Community impact strip */}
       <motion.div variants={fadeUp}>
-        <ImpactStrip />
+        <ImpactStrip stats={publicStats} />
       </motion.div>
 
       {/* Journey + Upcoming events */}
@@ -557,7 +751,9 @@ export default function VolunteerDashboard() {
           </div>
           {upcomingEvents?.content && upcomingEvents.content.length > 0 ? (
             <div className="space-y-3">
-              {upcomingEvents.content.slice(0, 2).map((ev) => <EventCard key={ev.id} event={ev} />)}
+              {upcomingEvents.content.slice(0, 2).map((ev) => (
+                <EventCard key={ev.id} event={ev} isApplied={appliedEventIds.has(ev.id!)} />
+              ))}
             </div>
           ) : (
             <Card className="border-0 shadow-md flex-1">
@@ -640,28 +836,8 @@ export default function VolunteerDashboard() {
       {/* Monthly challenge + NGO story */}
       <motion.div variants={fadeUp} className="grid gap-5 md:grid-cols-2">
         <MonthlyChallenge events={events} />
-        <NGOStoryWidget />
+        <NGOStoryWidget stats={publicStats} volunteerHours={hours} />
       </motion.div>
-
-      {/* Streak / motivation strip */}
-      {certCount > 0 && (
-        <motion.div variants={fadeUp}>
-          <div className="flex items-center gap-3 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/10 rounded-xl px-5 py-4 border border-orange-200/50">
-            <Flame className="h-5 w-5 text-primary shrink-0" />
-            <div>
-              <div className="font-semibold text-sm text-primary">
-                {certCount} Certificate{certCount !== 1 ? "s" : ""} Earned
-              </div>
-              <div className="text-xs text-muted-foreground">Keep it up! You're doing amazing.</div>
-            </div>
-            <div className="ml-auto flex gap-1">
-              {Array.from({ length: Math.min(certCount, 5) }).map((_, i) => (
-                <span key={i} className="text-lg">🔥</span>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      )}
 
     </motion.div>
   );

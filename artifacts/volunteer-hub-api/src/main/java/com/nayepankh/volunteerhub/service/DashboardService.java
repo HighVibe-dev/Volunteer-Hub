@@ -2,6 +2,7 @@ package com.nayepankh.volunteerhub.service;
 
 import com.nayepankh.volunteerhub.dto.dashboard.DashboardStatsResponse;
 import com.nayepankh.volunteerhub.dto.dashboard.LeaderboardEntry;
+import com.nayepankh.volunteerhub.dto.dashboard.PublicStatsResponse;
 import com.nayepankh.volunteerhub.entity.User;
 import com.nayepankh.volunteerhub.enums.ApplicationStatus;
 import com.nayepankh.volunteerhub.enums.EventStatus;
@@ -25,6 +26,25 @@ public class DashboardService {
     private final AttendanceRepository attendanceRepository;
     private final VolunteerSkillRepository volunteerSkillRepository;
     private final EventApplicationRepository applicationRepository;
+    private final CertificateRepository certificateRepository;
+
+    public PublicStatsResponse getPublicStats() {
+        long totalVolunteers = userRepository.countByRole(Role.ROLE_VOLUNTEER);
+        long totalEvents = eventRepository.count();
+        Double totalHoursRaw = attendanceRepository.sumAllHours();
+        double totalHours = totalHoursRaw != null ? totalHoursRaw : 0.0;
+        LocalDateTime startOfMonth = LocalDateTime.now()
+                .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        long eventsThisMonth = eventRepository.countByCreatedAtSince(startOfMonth);
+        long certificatesIssued = certificateRepository.count();
+        return PublicStatsResponse.builder()
+                .totalVolunteers(totalVolunteers)
+                .totalEvents(totalEvents)
+                .totalVolunteerHours(totalHours)
+                .eventsThisMonth(eventsThisMonth)
+                .certificatesIssued(certificatesIssued)
+                .build();
+    }
 
     public DashboardStatsResponse getStats() {
         long totalVolunteers = userRepository.countByRole(Role.ROLE_VOLUNTEER);

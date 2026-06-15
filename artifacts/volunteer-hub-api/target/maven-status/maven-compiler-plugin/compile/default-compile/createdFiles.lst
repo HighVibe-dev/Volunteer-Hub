@@ -35,6 +35,7 @@ com/nayepankh/volunteerhub/dto/event/EventResponse.class
 com/nayepankh/volunteerhub/dto/event/EventRequirementRequest.class
 com/nayepankh/volunteerhub/entity/EventApplication$EventApplicationBuilder.class
 com/nayepankh/volunteerhub/repository/NotificationRepository.class
+com/nayepankh/volunteerhub/controller/StatsController.class
 com/nayepankh/volunteerhub/service/AuditLogService.class
 com/nayepankh/volunteerhub/entity/AuditLog.class
 com/nayepankh/volunteerhub/dto/volunteer/SkillResponse.class
@@ -75,6 +76,7 @@ com/nayepankh/volunteerhub/entity/VolunteerSkill.class
 com/nayepankh/volunteerhub/exception/UnauthorizedException.class
 com/nayepankh/volunteerhub/entity/VolunteerSkill$VolunteerSkillBuilder.class
 com/nayepankh/volunteerhub/VolunteerHubApplication.class
+com/nayepankh/volunteerhub/dto/dashboard/PublicStatsResponse.class
 com/nayepankh/volunteerhub/repository/EventRepository.class
 com/nayepankh/volunteerhub/service/EventService$1.class
 com/nayepankh/volunteerhub/entity/Notification.class
@@ -108,6 +110,7 @@ com/nayepankh/volunteerhub/controller/AuthController.class
 com/nayepankh/volunteerhub/entity/Attendance$AttendanceBuilder.class
 com/nayepankh/volunteerhub/entity/Notification$NotificationBuilder.class
 com/nayepankh/volunteerhub/repository/AuditLogRepository.class
+com/nayepankh/volunteerhub/dto/dashboard/PublicStatsResponse$PublicStatsResponseBuilder.class
 com/nayepankh/volunteerhub/security/JwtAuthFilter.class
 com/nayepankh/volunteerhub/entity/User$UserBuilder.class
 com/nayepankh/volunteerhub/entity/Attendance.class

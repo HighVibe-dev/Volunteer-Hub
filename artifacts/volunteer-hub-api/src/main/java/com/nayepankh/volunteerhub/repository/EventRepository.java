@@ -32,4 +32,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e WHERE e.status = 'UPCOMING' OR e.status = 'ACTIVE' ORDER BY e.startDate ASC")
     List<Event> findUpcomingEvents();
+
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.createdAt >= :since")
+    long countByCreatedAtSince(@Param("since") LocalDateTime since);
 }
