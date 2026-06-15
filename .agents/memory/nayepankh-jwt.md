@@ -13,7 +13,7 @@ No hardcoded secret in application.properties or in code. `jwt.secret` is set as
 
 **Why:** Code reviewers reject any hardcoded fallback. The random key approach is safe for dev (tokens invalidate on restart) and forces the team to set `JWT_SECRET` in production to get stable sessions.
 
-**How to apply:** Set `JWT_SECRET` as a Replit Secret (minimum 64 chars, base64 or random) before deploying to production.
+**How to apply:** `JWT_SECRET` is now set as a Replit Secret (64-byte base64 value). Sessions survive restarts in both dev and production. The ephemeral-key warning no longer appears in startup logs.
 
 ## Key files
 - `artifacts/volunteer-hub-api/src/main/java/com/nayepankh/volunteerhub/security/JwtUtil.java`
