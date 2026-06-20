@@ -1,4 +1,4 @@
-import bannerBg from "@assets/admin-banner.png";
+import bannerBg from "@assets/admin-banner-generated.png";
 import {
   useGetDashboardStats,
   getGetDashboardStatsQueryKey,
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
               <div className="space-y-2">
                 {leaderboard.map((entry, idx) => (
                   <div key={entry.volunteerId} className="flex items-center gap-2" data-testid={`dashboard-leader-${entry.volunteerId}`}>
-                    <div className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold shrink-0 ${idx === 0 ? "bg-amber-100 text-amber-700" : idx === 1 ? "bg-gray-100 text-gray-600" : "bg-muted text-muted-foreground"}`}>
+                    <div className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold shrink-0 ${idx === 0 ? "bg-amber-100 text-amber-700" : idx === 1 ? "bg-gray-100 text-gray-700" : "bg-orange-100 text-orange-700"}`}>
                       {idx + 1}
                     </div>
                     <div className="flex-1 min-w-0">
